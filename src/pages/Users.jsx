@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../services/api";
 import styles from "../assets/styles/Users.module.css";
 import { Helmet } from "react-helmet-async";
 import {
@@ -126,8 +126,6 @@ const StyledTableContainer = styled(TableContainer)({
 });
 
 function Users() {
-  const API = "http://localhost:3001/api";
-
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -159,9 +157,7 @@ function Users() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/users`, {
-        withCredentials: true,
-      });
+      const res = await api.get("/users");
       setUsers(res.data);
       setFilteredUsers(res.data);
     } catch (error) {
@@ -246,15 +242,11 @@ function Users() {
     }
 
     try {
-      await axios.post(
-        `${API}/users`,
-        {
-          school_id: schoolId,
-          password,
-          role,
-        },
-        { withCredentials: true },
-      );
+      await api.post("/users", {
+        school_id: schoolId,
+        password,
+        role,
+      });
 
       alert("User created successfully");
 
@@ -278,11 +270,7 @@ function Users() {
     const newStatus = user.status === "active" ? "inactive" : "active";
 
     try {
-      await axios.put(
-        `${API}/users/${user.id}/status`,
-        { status: newStatus },
-        { withCredentials: true },
-      );
+      await api.put(`/users/${user.id}/status`, { status: newStatus });
 
       fetchUsers();
     } catch (error) {
@@ -299,14 +287,10 @@ function Users() {
 
   const updateUser = async () => {
     try {
-      await axios.put(
-        `${API}/users/${editId}`,
-        {
-          school_id: editSchoolId,
-          role: editRole,
-        },
-        { withCredentials: true },
-      );
+      await api.put(`/users/${editId}`, {
+        school_id: editSchoolId,
+        role: editRole,
+      });
 
       alert("User updated");
 

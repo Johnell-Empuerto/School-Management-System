@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -53,9 +53,7 @@ function CalendarPage() {
   };
 
   const fetchEvents = async () => {
-    const res = await axios.get("http://localhost:3001/api/calendar", {
-      withCredentials: true,
-    });
+    const res = await api.get("/calendar");
 
     const formatted = res.data.map((e) => {
       const date = new Date(e.date);
@@ -78,16 +76,10 @@ function CalendarPage() {
 
     if (editingEvent) {
       // UPDATE EVENT
-      await axios.put(
-        `http://localhost:3001/api/calendar/${editingEvent.id}`,
-        formData,
-        { withCredentials: true },
-      );
+      await api.put(`/calendar/${editingEvent.id}`, formData);
     } else {
       // CREATE EVENT
-      await axios.post("http://localhost:3001/api/calendar", formData, {
-        withCredentials: true,
-      });
+      await api.post("/calendar", formData);
     }
 
     setEditingEvent(null);
@@ -103,10 +95,7 @@ function CalendarPage() {
 
     if (!window.confirm("Delete this event?")) return;
 
-    await axios.delete(
-      `http://localhost:3001/api/calendar/${editingEvent.id}`,
-      { withCredentials: true },
-    );
+    await api.delete(`/calendar/${editingEvent.id}`);
 
     setEditingEvent(null);
     setFormData({ date: "", type: "holiday", description: "" });

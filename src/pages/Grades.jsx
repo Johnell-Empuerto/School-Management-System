@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../services/api";
 import styles from "../assets/styles/Grades.module.css";
 import { Helmet } from "react-helmet-async";
 
@@ -162,8 +162,6 @@ function Grades() {
   const [orderBy, setOrderBy] = useState("student_name");
   const [order, setOrder] = useState("asc");
 
-  const API = "http://localhost:3001/api";
-
   // Grading periods
   const gradingPeriods = [
     { value: "1st", label: "1st Grading", color: "#4caf50" },
@@ -198,9 +196,7 @@ function Grades() {
   const fetchClassSubjects = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/class-subjects/teacher`, {
-        withCredentials: true,
-      });
+      const res = await api.get("/class-subjects/teacher");
       setClassSubjects(res.data);
     } catch (error) {
       console.error("Error fetching class subjects:", error);
@@ -213,10 +209,7 @@ function Grades() {
   const fetchGrades = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(
-        `${API}/grades/${classSubjectId}/${gradingPeriod}`,
-        { withCredentials: true },
-      );
+      const res = await api.get(`/grades/${classSubjectId}/${gradingPeriod}`);
       setGrades(res.data);
     } catch (error) {
       console.error("Error fetching grades:", error);
@@ -235,16 +228,12 @@ function Grades() {
   const saveGrade = async (g) => {
     setSaving(true);
     try {
-      await axios.post(
-        `${API}/grades`,
-        {
-          enrollment_id: g.enrollment_id,
-          class_subject_id: classSubjectId,
-          grading_period: gradingPeriod,
-          grade: g.grade,
-        },
-        { withCredentials: true },
-      );
+      await api.post("/grades", {
+        enrollment_id: g.enrollment_id,
+        class_subject_id: classSubjectId,
+        grading_period: gradingPeriod,
+        grade: g.grade,
+      });
 
       showSnackbar(`Grade saved for ${g.first_name} ${g.last_name}`, "success");
     } catch (error) {
@@ -265,16 +254,12 @@ function Grades() {
       const savePromises = grades
         .filter((g) => g.grade && g.grade.trim() !== "")
         .map((g) =>
-          axios.post(
-            `${API}/grades`,
-            {
-              enrollment_id: g.enrollment_id,
-              class_subject_id: classSubjectId,
-              grading_period: gradingPeriod,
-              grade: g.grade,
-            },
-            { withCredentials: true },
-          ),
+          api.post("/grades", {
+            enrollment_id: g.enrollment_id,
+            class_subject_id: classSubjectId,
+            grading_period: gradingPeriod,
+            grade: g.grade,
+          }),
         );
 
       await Promise.all(savePromises);

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import styles from "../assets/styles/Reports.module.css";
@@ -191,9 +191,7 @@ function Reports() {
   // API Calls
   const fetchSchoolYears = async () => {
     try {
-      const res = await axios.get("http://localhost:3001/api/school-years", {
-        withCredentials: true,
-      });
+      const res = await api.get("/school-years");
       setSchoolYears(res.data);
       if (res.data.length > 0) {
         setSchoolYearId(res.data[0].id); // Auto-select latest school year
@@ -205,9 +203,8 @@ function Reports() {
 
   const fetchClassesBySchoolYear = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:3001/api/classes-by-year?school_year_id=${schoolYearId}`,
-        { withCredentials: true },
+      const res = await api.get(
+        `/classes-by-year?school_year_id=${schoolYearId}`,
       );
       setClasses(res.data);
     } catch (error) {
@@ -217,10 +214,7 @@ function Reports() {
 
   const fetchStudentsByClass = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:3001/api/students/class/${classId}`,
-        { withCredentials: true },
-      );
+      const res = await api.get(`/students/class/${classId}`);
       setStudents(res.data);
     } catch (error) {
       console.error("Error fetching students:", error);
@@ -245,9 +239,8 @@ function Reports() {
     setSelectedClass(classInfo);
 
     try {
-      const res = await axios.get(
-        `http://localhost:3001/api/reports/student/${studentId}?class_id=${classId}&school_year_id=${schoolYearId}`,
-        { withCredentials: true },
+      const res = await api.get(
+        `/reports/student/${studentId}?class_id=${classId}&school_year_id=${schoolYearId}`,
       );
       setReportData(res.data);
     } catch (error) {
@@ -266,9 +259,8 @@ function Reports() {
     setSelectedClass(classInfo);
 
     try {
-      const res = await axios.get(
-        `http://localhost:3001/api/reports/class/${classId}?school_year_id=${schoolYearId}`,
-        { withCredentials: true },
+      const res = await api.get(
+        `/reports/class/${classId}?school_year_id=${schoolYearId}`,
       );
       setReportData(res.data);
     } catch (error) {
@@ -287,9 +279,8 @@ function Reports() {
     setSelectedClass(classInfo);
 
     try {
-      const res = await axios.get(
-        `http://localhost:3001/api/reports/attendance/${classId}?school_year_id=${schoolYearId}`,
-        { withCredentials: true },
+      const res = await api.get(
+        `/reports/attendance/${classId}?school_year_id=${schoolYearId}`,
       );
       setReportData(res.data);
     } catch (error) {

@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
+import api from "../services/api";
 
 function ProtectedRoute({ allowedRoles }) {
   const [loading, setLoading] = useState(true);
@@ -8,15 +9,16 @@ function ProtectedRoute({ allowedRoles }) {
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/me", {
-      credentials: "include",
-    })
+    api
+      .get("/me")
       .then((res) => {
-        if (res.ok) {
+        if (res.status === 200) {
           setAuthenticated(true);
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        // Handle error silently
+      })
       .finally(() => setLoading(false));
   }, []);
 

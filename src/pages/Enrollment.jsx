@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../services/api";
 import styles from "../assets/styles/Enrollment.module.css";
 import { Helmet } from "react-helmet-async";
 
@@ -186,8 +186,6 @@ function Enrollment() {
     school_year_id: "",
   });
 
-  const API = "http://localhost:3001/api";
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -258,9 +256,7 @@ function Enrollment() {
   };
 
   const fetchEnrollments = async () => {
-    const res = await axios.get(`${API}/enrollments`, {
-      withCredentials: true,
-    });
+    const res = await api.get("/enrollments");
     setEnrollments(res.data);
     setFilteredEnrollments(
       res.data.filter((e) => e.enrollment_status === "enrolled"),
@@ -268,23 +264,17 @@ function Enrollment() {
   };
 
   const fetchStudents = async () => {
-    const res = await axios.get(`${API}/students`, {
-      withCredentials: true,
-    });
+    const res = await api.get("/students");
     setStudents(res.data);
   };
 
   const fetchClasses = async () => {
-    const res = await axios.get(`${API}/classes`, {
-      withCredentials: true,
-    });
+    const res = await api.get("/classes");
     setClasses(res.data);
   };
 
   const fetchSchoolYears = async () => {
-    const res = await axios.get(`${API}/school-years`, {
-      withCredentials: true,
-    });
+    const res = await api.get("/school-years");
     setSchoolYears(res.data);
   };
 
@@ -307,9 +297,7 @@ function Enrollment() {
     e.preventDefault();
 
     try {
-      await axios.post(`${API}/enrollment-requests`, formData, {
-        withCredentials: true,
-      });
+      await api.post("/enrollment-requests", formData);
 
       showSnackbar("Enrollment request submitted successfully", "success");
 
@@ -334,11 +322,7 @@ function Enrollment() {
       if (!window.confirm("Are you sure you want to drop this student?"))
         return;
 
-      await axios.put(
-        `${API}/enrollments/drop/${id}`,
-        {},
-        { withCredentials: true },
-      );
+      await api.put(`/enrollments/drop/${id}`);
 
       showSnackbar("Student dropped successfully", "success");
       fetchData();
@@ -355,11 +339,7 @@ function Enrollment() {
       if (!window.confirm("Are you sure you want to restore this student?"))
         return;
 
-      await axios.put(
-        `${API}/enrollments/restore/${id}`,
-        {},
-        { withCredentials: true },
-      );
+      await api.put(`/enrollments/restore/${id}`);
 
       showSnackbar("Student restored successfully", "success");
       fetchData();

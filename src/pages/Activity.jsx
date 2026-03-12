@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import styles from "../assets/styles/Activity.module.css";
 import { Helmet } from "react-helmet-async";
 
@@ -34,9 +34,8 @@ function Activity() {
   const fetchActivities = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(
-        `http://localhost:3001/api/activities?search=${search}&sort=${sort}&page=${page}`,
-        { withCredentials: true },
+      const res = await api.get(
+        `/activities?search=${search}&sort=${sort}&page=${page}`,
       );
 
       // If your backend returns pagination metadata
@@ -60,15 +59,9 @@ function Activity() {
 
     try {
       if (editId) {
-        await axios.put(
-          `http://localhost:3001/api/activities/${editId}`,
-          formData,
-          { withCredentials: true },
-        );
+        await api.put(`/activities/${editId}`, formData);
       } else {
-        await axios.post("http://localhost:3001/api/activities", formData, {
-          withCredentials: true,
-        });
+        await api.post("/activities", formData);
       }
 
       // Reset form
@@ -104,9 +97,7 @@ function Activity() {
     if (!window.confirm("Delete this post?")) return;
 
     try {
-      await axios.delete(`http://localhost:3001/api/activities/${id}`, {
-        withCredentials: true,
-      });
+      await api.delete(`/activities/${id}`);
 
       fetchActivities();
     } catch (err) {

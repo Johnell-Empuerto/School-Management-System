@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../services/api";
 import styles from "../assets/styles/Classes.module.css";
 import { Helmet } from "react-helmet-async";
 
@@ -130,8 +130,6 @@ function Classes() {
     school_year_id: "",
   });
 
-  const API = "http://localhost:3001/api";
-
   useEffect(() => {
     fetchClasses();
     fetchSchoolYears();
@@ -163,7 +161,7 @@ function Classes() {
   const fetchClasses = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/classes`);
+      const res = await api.get("/classes");
       setClasses(res.data);
       setFilteredClasses(res.data);
     } catch (error) {
@@ -174,7 +172,7 @@ function Classes() {
   };
 
   const fetchSchoolYears = async () => {
-    const res = await axios.get(`${API}/school-years`);
+    const res = await api.get("/school-years");
     setSchoolYears(res.data);
   };
 
@@ -223,7 +221,7 @@ function Classes() {
 
   const addClass = async () => {
     try {
-      await axios.post(`${API}/classes`, formData);
+      await api.post("/classes", formData);
 
       setFormData({
         grade_level: "",
@@ -244,7 +242,7 @@ function Classes() {
       if (!window.confirm("Are you sure you want to delete this class?"))
         return;
 
-      await axios.delete(`${API}/classes/${id}`);
+      await api.delete(`/classes/${id}`);
       fetchClasses();
     } catch (err) {
       const message = err.response?.data?.message || "Failed to delete class";

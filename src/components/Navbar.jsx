@@ -13,6 +13,7 @@ import {
   FaSun,
 } from "react-icons/fa";
 import styles from "../assets/styles/Navbar.module.css";
+import api from "../services/api";
 
 const Navbar = ({ toggleSidebar, collapsed }) => {
   const navigate = useNavigate();
@@ -26,10 +27,7 @@ const Navbar = ({ toggleSidebar, collapsed }) => {
 
   const logout = async () => {
     try {
-      await fetch("http://localhost:3001/api/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+      await api.post("/logout");
 
       localStorage.removeItem("user");
       navigate("/");

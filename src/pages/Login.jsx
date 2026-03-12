@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../assets/styles/Login.module.css";
 import { FaUser, FaLock, FaSignInAlt, FaSchool } from "react-icons/fa";
+import api from "../services/api";
 
 function Login() {
   const navigate = useNavigate();
@@ -11,40 +12,34 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const API = "http://localhost:3001/api/login";
-
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await fetch(API, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          school_id: schoolId,
-          password: password,
-        }),
+      const response = await api.post("/login", {
+        school_id: schoolId,
+        password: password,
       });
 
-      const data = await response.json();
+      // api.interceptors already handles credentials and headers
+      // response.data is already parsed JSON
 
-      if (response.ok) {
-        localStorage.setItem("user", JSON.stringify(data.user));
+      if (response.data.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         // Show success message
         setTimeout(() => {
           navigate("/dashboard");
         }, 500);
       } else {
-        alert(data.message);
+        alert(response.data.message || "Login failed");
         setLoading(false);
       }
     } catch (err) {
       console.log(err);
-      alert("Connection error. Please try again.");
+      alert(
+        err.response?.data?.message || "Connection error. Please try again.",
+      );
       setLoading(false);
     }
   };

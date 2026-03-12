@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import "../assets/styles/Profile.css";
 import { Helmet } from "react-helmet-async";
 
 function Profile() {
-  const API = "http://localhost:3001/api";
-
   const [profile, setProfile] = useState(null);
   const [grades, setGrades] = useState([]);
   const [attendance, setAttendance] = useState(null);
@@ -15,9 +13,7 @@ function Profile() {
 
   const fetchProfile = async () => {
     try {
-      const res = await axios.get(`${API}/profile`, {
-        withCredentials: true,
-      });
+      const res = await api.get("/profile");
 
       setProfile(res.data);
       setFormData(res.data); // fill edit form
@@ -52,9 +48,7 @@ function Profile() {
 
   const updateProfile = async () => {
     try {
-      await axios.put(`${API}/profile`, formData, {
-        withCredentials: true,
-      });
+      await api.put("/profile", formData);
 
       setShowEditModal(false);
       fetchProfile();
@@ -65,9 +59,7 @@ function Profile() {
 
   const fetchGrades = async () => {
     try {
-      const res = await axios.get(`${API}/profile/grades`, {
-        withCredentials: true,
-      });
+      const res = await api.get("/profile/grades");
       setGrades(res.data);
     } catch (error) {
       console.error(error);
@@ -75,9 +67,7 @@ function Profile() {
   };
 
   const fetchAttendance = async () => {
-    const res = await axios.get(`${API}/profile/attendance`, {
-      withCredentials: true,
-    });
+    const res = await api.get("/profile/attendance");
     setAttendance(res.data);
   };
 

@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../services/api";
 import styles from "../assets/styles/Subjects.module.css";
+import { Helmet } from "react-helmet-async";
 import {
   FaSearch,
   FaTimes,
@@ -103,8 +104,6 @@ function Subjects() {
     subject_code: "",
   });
 
-  const API = "http://localhost:3001/api";
-
   useEffect(() => {
     fetchSubjects();
   }, []);
@@ -132,7 +131,7 @@ function Subjects() {
   const fetchSubjects = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/subjects`);
+      const res = await api.get("/subjects");
       setSubjects(res.data);
       setFilteredSubjects(res.data);
     } catch (error) {
@@ -187,7 +186,7 @@ function Subjects() {
 
   const addSubject = async () => {
     try {
-      await axios.post(`${API}/subjects`, formData);
+      await api.post("/subjects", formData);
 
       setFormData({
         subject_name: "",
@@ -207,7 +206,7 @@ function Subjects() {
       return;
 
     try {
-      await axios.delete(`${API}/subjects/${id}`);
+      await api.delete(`/subjects/${id}`);
       fetchSubjects();
     } catch (error) {
       const message =
@@ -224,215 +223,225 @@ function Subjects() {
   ];
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className={styles.subjectsContainer}>
-        {/* Header */}
-        <div className={styles.header}>
-          <div className={styles.headerTitle}>
-            <h1>Subjects Management</h1>
-            <p>Manage and track all academic subjects</p>
-          </div>
+    <>
+      <Helmet>
+        <title>Subject | School Management System</title>
+      </Helmet>
 
-          <div className={styles.headerActions}>
-            <button
-              className={styles.addBtn}
-              onClick={() => {
-                setFormData({
-                  subject_name: "",
-                  subject_code: "",
-                });
-                setShowModal(true);
-              }}
-            >
-              <FaPlus /> Add Subject
-            </button>
-          </div>
-        </div>
-
-        {/* Search Control */}
-        <div className={styles.controls}>
-          <div className={styles.searchBox}>
-            <FaSearch className={styles.searchIcon} />
-            <input
-              type="text"
-              placeholder="Search by subject name or code..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            {searchTerm && (
-              <button
-                className={styles.clearSearch}
-                onClick={() => setSearchTerm("")}
-              >
-                <FaTimes />
-              </button>
-            )}
-          </div>
-
-          <button className={styles.refreshBtn} onClick={fetchSubjects}>
-            <FaSync /> Refresh
-          </button>
-        </div>
-
-        {/* Table */}
-        <StyledTableContainer component={Paper}>
-          {loading ? (
-            <div className={styles.loadingState}>
-              <div className={styles.spinner}></div>
-              <p>Loading subjects...</p>
+      <ThemeProvider theme={theme}>
+        <div className={styles.subjectsContainer}>
+          {/* Header */}
+          <div className={styles.header}>
+            <div className={styles.headerTitle}>
+              <h1>Subjects Management</h1>
+              <p>Manage and track all academic subjects</p>
             </div>
-          ) : (
-            <>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    {headCells.map((headCell) => (
-                      <TableCell key={headCell.id}>
-                        {headCell.sortable ? (
-                          <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : "asc"}
-                            onClick={() => handleRequestSort(headCell.id)}
-                            sx={{ color: "white !important" }}
-                          >
-                            {headCell.label}
-                          </TableSortLabel>
-                        ) : (
-                          headCell.label
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
 
-                <TableBody>
-                  {paginatedSubjects.length > 0 ? (
-                    paginatedSubjects.map((subject) => (
-                      <TableRow key={subject.id} hover>
-                        <TableCell>
-                          <div className={styles.subjectNameCell}>
-                            <FaBook className={styles.subjectIcon} />
-                            <span>{subject.subject_name}</span>
-                          </div>
-                        </TableCell>
-
-                        <TableCell>
-                          <Chip
-                            label={subject.subject_code}
-                            size="small"
-                            sx={{
-                              backgroundColor: "#e8f5e8",
-                              color: "#2e7d32",
-                              fontWeight: 600,
-                              fontFamily: "monospace",
-                            }}
-                          />
-                        </TableCell>
-
-                        <TableCell>
-                          <Tooltip title="Delete Subject">
-                            <IconButton
-                              size="small"
-                              onClick={() => deleteSubject(subject.id)}
-                              sx={{
-                                color: "#f44336",
-                                "&:hover": { backgroundColor: "#ffebee" },
-                              }}
-                            >
-                              <FaTrash />
-                            </IconButton>
-                          </Tooltip>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={3} className={styles.emptyState}>
-                        <div className={styles.emptyStateContent}>
-                          <FaBook size={48} color="#ccc" />
-                          <h3>No subjects found</h3>
-                          <p>Try adjusting your search or add a new subject</p>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-
-              {/* Pagination */}
-              <TablePagination
-                rowsPerPageOptions={[10, 20, 50]}
-                component="div"
-                count={filteredSubjects.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                sx={{
-                  borderTop: "1px solid rgba(0, 0, 0, 0.1)",
-                  ".MuiTablePagination-select": {
-                    borderRadius: "20px",
-                  },
+            <div className={styles.headerActions}>
+              <button
+                className={styles.addBtn}
+                onClick={() => {
+                  setFormData({
+                    subject_name: "",
+                    subject_code: "",
+                  });
+                  setShowModal(true);
                 }}
-              />
-            </>
-          )}
-        </StyledTableContainer>
+              >
+                <FaPlus /> Add Subject
+              </button>
+            </div>
+          </div>
 
-        {/* Modal */}
-        {showModal && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
-              <div className={styles.modalHeader}>
-                <h2>Add New Subject</h2>
+          {/* Search Control */}
+          <div className={styles.controls}>
+            <div className={styles.searchBox}>
+              <FaSearch className={styles.searchIcon} />
+              <input
+                type="text"
+                placeholder="Search by subject name or code..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
                 <button
-                  className={styles.closeBtn}
-                  onClick={() => setShowModal(false)}
+                  className={styles.clearSearch}
+                  onClick={() => setSearchTerm("")}
                 >
                   <FaTimes />
                 </button>
-              </div>
+              )}
+            </div>
 
-              <div className={styles.modalBody}>
-                <div className={styles.formGroup}>
-                  <label>Subject Name</label>
-                  <input
-                    type="text"
-                    name="subject_name"
-                    placeholder="e.g., Mathematics, Science, English"
-                    value={formData.subject_name}
-                    onChange={handleChange}
-                  />
+            <button className={styles.refreshBtn} onClick={fetchSubjects}>
+              <FaSync /> Refresh
+            </button>
+          </div>
+
+          {/* Table */}
+          <StyledTableContainer component={Paper}>
+            {loading ? (
+              <div className={styles.loadingState}>
+                <div className={styles.spinner}></div>
+                <p>Loading subjects...</p>
+              </div>
+            ) : (
+              <>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      {headCells.map((headCell) => (
+                        <TableCell key={headCell.id}>
+                          {headCell.sortable ? (
+                            <TableSortLabel
+                              active={orderBy === headCell.id}
+                              direction={
+                                orderBy === headCell.id ? order : "asc"
+                              }
+                              onClick={() => handleRequestSort(headCell.id)}
+                              sx={{ color: "white !important" }}
+                            >
+                              {headCell.label}
+                            </TableSortLabel>
+                          ) : (
+                            headCell.label
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+
+                  <TableBody>
+                    {paginatedSubjects.length > 0 ? (
+                      paginatedSubjects.map((subject) => (
+                        <TableRow key={subject.id} hover>
+                          <TableCell>
+                            <div className={styles.subjectNameCell}>
+                              <FaBook className={styles.subjectIcon} />
+                              <span>{subject.subject_name}</span>
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <Chip
+                              label={subject.subject_code}
+                              size="small"
+                              sx={{
+                                backgroundColor: "#e8f5e8",
+                                color: "#2e7d32",
+                                fontWeight: 600,
+                                fontFamily: "monospace",
+                              }}
+                            />
+                          </TableCell>
+
+                          <TableCell>
+                            <Tooltip title="Delete Subject">
+                              <IconButton
+                                size="small"
+                                onClick={() => deleteSubject(subject.id)}
+                                sx={{
+                                  color: "#f44336",
+                                  "&:hover": { backgroundColor: "#ffebee" },
+                                }}
+                              >
+                                <FaTrash />
+                              </IconButton>
+                            </Tooltip>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={3} className={styles.emptyState}>
+                          <div className={styles.emptyStateContent}>
+                            <FaBook size={48} color="#ccc" />
+                            <h3>No subjects found</h3>
+                            <p>
+                              Try adjusting your search or add a new subject
+                            </p>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+
+                {/* Pagination */}
+                <TablePagination
+                  rowsPerPageOptions={[10, 20, 50]}
+                  component="div"
+                  count={filteredSubjects.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  sx={{
+                    borderTop: "1px solid rgba(0, 0, 0, 0.1)",
+                    ".MuiTablePagination-select": {
+                      borderRadius: "20px",
+                    },
+                  }}
+                />
+              </>
+            )}
+          </StyledTableContainer>
+
+          {/* Modal */}
+          {showModal && (
+            <div className={styles.modalOverlay}>
+              <div className={styles.modal}>
+                <div className={styles.modalHeader}>
+                  <h2>Add New Subject</h2>
+                  <button
+                    className={styles.closeBtn}
+                    onClick={() => setShowModal(false)}
+                  >
+                    <FaTimes />
+                  </button>
                 </div>
 
-                <div className={styles.formGroup}>
-                  <label>Subject Code</label>
-                  <input
-                    type="text"
-                    name="subject_code"
-                    placeholder="e.g., MATH101, SCI202, ENG103"
-                    value={formData.subject_code}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
+                <div className={styles.modalBody}>
+                  <div className={styles.formGroup}>
+                    <label>Subject Name</label>
+                    <input
+                      type="text"
+                      name="subject_name"
+                      placeholder="e.g., Mathematics, Science, English"
+                      value={formData.subject_name}
+                      onChange={handleChange}
+                    />
+                  </div>
 
-              <div className={styles.modalFooter}>
-                <button
-                  className={styles.cancelBtn}
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
-                </button>
-                <button className={styles.saveBtn} onClick={addSubject}>
-                  Save Subject
-                </button>
+                  <div className={styles.formGroup}>
+                    <label>Subject Code</label>
+                    <input
+                      type="text"
+                      name="subject_code"
+                      placeholder="e.g., MATH101, SCI202, ENG103"
+                      value={formData.subject_code}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.modalFooter}>
+                  <button
+                    className={styles.cancelBtn}
+                    onClick={() => setShowModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button className={styles.saveBtn} onClick={addSubject}>
+                    Save Subject
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    </ThemeProvider>
+          )}
+        </div>
+      </ThemeProvider>
+    </>
   );
 }
 

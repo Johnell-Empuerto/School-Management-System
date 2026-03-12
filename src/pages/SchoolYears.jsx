@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../services/api";
 import styles from "../assets/styles/SchoolYears.module.css";
 import { Helmet } from "react-helmet-async";
 import {
@@ -138,8 +138,6 @@ function SchoolYears() {
     year_end: "",
   });
 
-  const API = "http://localhost:3001/api";
-
   useEffect(() => {
     fetchYears();
   }, []);
@@ -174,7 +172,7 @@ function SchoolYears() {
   const fetchYears = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/school-years-full`);
+      const res = await api.get("/school-years-full");
       setYears(res.data);
       setFilteredYears(res.data);
     } catch (error) {
@@ -242,9 +240,9 @@ function SchoolYears() {
   const saveYear = async () => {
     try {
       if (editYear) {
-        await axios.put(`${API}/school-years/${editYear.id}`, formData);
+        await api.put(`/school-years/${editYear.id}`, formData);
       } else {
-        await axios.post(`${API}/school-years`, formData);
+        await api.post("/school-years", formData);
       }
 
       setShowModal(false);
@@ -277,7 +275,7 @@ function SchoolYears() {
       return;
 
     try {
-      await axios.delete(`${API}/school-years/${id}`);
+      await api.delete(`/school-years/${id}`);
       fetchYears();
     } catch (error) {
       alert(error.response?.data?.message || "Failed to delete school year");
@@ -286,7 +284,7 @@ function SchoolYears() {
 
   const activateYear = async (id) => {
     try {
-      await axios.put(`${API}/school-years/${id}/activate`);
+      await api.put(`/school-years/${id}/activate`);
       fetchYears();
     } catch (error) {
       alert(error.response?.data?.message || "Failed to activate school year");

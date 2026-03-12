@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import styles from "../assets/styles/Students.module.css";
+
+import { Helmet } from "react-helmet-async";
+
 import {
   FaUserPlus,
   FaEdit,
@@ -145,13 +148,11 @@ const Students = () => {
 
   const [editId, setEditId] = useState(null);
 
-  const API = "http://localhost:3001/api";
-
   // FETCH STUDENTS
   const fetchStudents = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/students`, { withCredentials: true });
+      const res = await api.get("/students");
       setStudents(res.data);
       setFilteredStudents(res.data);
     } catch (error) {
@@ -257,12 +258,10 @@ const Students = () => {
   const handleSubmit = async () => {
     try {
       if (editId) {
-        await axios.put(`${API}/students/${editId}`, form, {
-          withCredentials: true,
-        });
+        await api.put(`/students/${editId}`, form);
         alert("Student updated successfully");
       } else {
-        await axios.post(`${API}/students`, form, { withCredentials: true });
+        await api.post("/students", form);
         alert("Student created successfully");
       }
 
@@ -333,7 +332,7 @@ const Students = () => {
       return;
 
     try {
-      await axios.delete(`${API}/students/${id}`, { withCredentials: true });
+      await api.delete(`/students/${id}`);
       fetchStudents();
       alert("Student deleted successfully");
     } catch (error) {
@@ -388,615 +387,638 @@ const Students = () => {
   ];
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className={styles.studentsContainer}>
-        {/* Header Section */}
-        <div className={styles.header}>
-          <div className={styles.headerTitle}>
-            <h1>Students Management</h1>
-            <p>Manage and track all student information</p>
+    <>
+      <Helmet>
+        <title>Student | School Management System</title>
+      </Helmet>
+
+      <ThemeProvider theme={theme}>
+        <div className={styles.studentsContainer}>
+          {/* Header Section */}
+          <div className={styles.header}>
+            <div className={styles.headerTitle}>
+              <h1>Students Management</h1>
+              <p>Manage and track all student information</p>
+            </div>
+
+            <div className={styles.headerActions}>
+              <button
+                className={styles.addBtn}
+                onClick={() => {
+                  resetForm();
+                  setShowModal(true);
+                }}
+              >
+                <FaUserPlus /> Add Student
+              </button>
+            </div>
           </div>
 
-          <div className={styles.headerActions}>
-            <button
-              className={styles.addBtn}
-              onClick={() => {
-                resetForm();
-                setShowModal(true);
-              }}
-            >
-              <FaUserPlus /> Add Student
+          {/* Stats Cards */}
+          <div className={styles.statsContainer}>
+            <div className={styles.statCard}>
+              <div
+                className={styles.statIcon}
+                style={{ background: "#e3f2fd" }}
+              >
+                <FaUser
+                  className={styles.statIconSvg}
+                  style={{ color: "#1976d2" }}
+                />
+              </div>
+              <div className={styles.statInfo}>
+                <span className={styles.statValue}>{students.length}</span>
+                <span className={styles.statLabel}>Total Students</span>
+              </div>
+            </div>
+
+            <div className={styles.statCard}>
+              <div
+                className={styles.statIcon}
+                style={{ background: "#e8f5e8" }}
+              >
+                <FaCheckCircle
+                  className={styles.statIconSvg}
+                  style={{ color: "#2e7d32" }}
+                />
+              </div>
+              <div className={styles.statInfo}>
+                <span className={styles.statValue}>
+                  {students.filter((s) => s.status === "active").length}
+                </span>
+                <span className={styles.statLabel}>Active</span>
+              </div>
+            </div>
+
+            <div className={styles.statCard}>
+              <div
+                className={styles.statIcon}
+                style={{ background: "#fff3e0" }}
+              >
+                <FaGraduationCap
+                  className={styles.statIconSvg}
+                  style={{ color: "#ed6c02" }}
+                />
+              </div>
+              <div className={styles.statInfo}>
+                <span className={styles.statValue}>
+                  {students.filter((s) => s.status === "graduated").length}
+                </span>
+                <span className={styles.statLabel}>Graduated</span>
+              </div>
+            </div>
+
+            <div className={styles.statCard}>
+              <div
+                className={styles.statIcon}
+                style={{ background: "#ffebee" }}
+              >
+                <FaExclamationTriangle
+                  className={styles.statIconSvg}
+                  style={{ color: "#d32f2f" }}
+                />
+              </div>
+              <div className={styles.statInfo}>
+                <span className={styles.statValue}>
+                  {
+                    students.filter(
+                      (s) =>
+                        s.status === "dropped" || s.status === "transferred",
+                    ).length
+                  }
+                </span>
+                <span className={styles.statLabel}>Inactive</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Search and Filter Bar - USING YOUR ORIGINAL CSS */}
+          <div className={styles.controls}>
+            <div className={styles.searchBox}>
+              <FaSearch className={styles.searchIcon} />
+              <input
+                type="text"
+                placeholder="Search by name, ID, or guardian..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button
+                  className={styles.clearSearch}
+                  onClick={() => setSearchTerm("")}
+                >
+                  <FaTimes />
+                </button>
+              )}
+            </div>
+
+            <div className={styles.filterBox}>
+              <FaFilter className={styles.filterIcon} />
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="graduated">Graduated</option>
+                <option value="dropped">Dropped</option>
+                <option value="transferred">Transferred</option>
+              </select>
+            </div>
+
+            <button className={styles.refreshBtn} onClick={fetchStudents}>
+              <FaSync /> Refresh
             </button>
           </div>
-        </div>
 
-        {/* Stats Cards */}
-        <div className={styles.statsContainer}>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: "#e3f2fd" }}>
-              <FaUser
-                className={styles.statIconSvg}
-                style={{ color: "#1976d2" }}
-              />
-            </div>
-            <div className={styles.statInfo}>
-              <span className={styles.statValue}>{students.length}</span>
-              <span className={styles.statLabel}>Total Students</span>
-            </div>
-          </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: "#e8f5e8" }}>
-              <FaCheckCircle
-                className={styles.statIconSvg}
-                style={{ color: "#2e7d32" }}
-              />
-            </div>
-            <div className={styles.statInfo}>
-              <span className={styles.statValue}>
-                {students.filter((s) => s.status === "active").length}
-              </span>
-              <span className={styles.statLabel}>Active</span>
-            </div>
-          </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: "#fff3e0" }}>
-              <FaGraduationCap
-                className={styles.statIconSvg}
-                style={{ color: "#ed6c02" }}
-              />
-            </div>
-            <div className={styles.statInfo}>
-              <span className={styles.statValue}>
-                {students.filter((s) => s.status === "graduated").length}
-              </span>
-              <span className={styles.statLabel}>Graduated</span>
-            </div>
-          </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statIcon} style={{ background: "#ffebee" }}>
-              <FaExclamationTriangle
-                className={styles.statIconSvg}
-                style={{ color: "#d32f2f" }}
-              />
-            </div>
-            <div className={styles.statInfo}>
-              <span className={styles.statValue}>
-                {
-                  students.filter(
-                    (s) => s.status === "dropped" || s.status === "transferred",
-                  ).length
-                }
-              </span>
-              <span className={styles.statLabel}>Inactive</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Search and Filter Bar - USING YOUR ORIGINAL CSS */}
-        <div className={styles.controls}>
-          <div className={styles.searchBox}>
-            <FaSearch className={styles.searchIcon} />
-            <input
-              type="text"
-              placeholder="Search by name, ID, or guardian..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            {searchTerm && (
-              <button
-                className={styles.clearSearch}
-                onClick={() => setSearchTerm("")}
-              >
-                <FaTimes />
-              </button>
-            )}
-          </div>
-
-          <div className={styles.filterBox}>
-            <FaFilter className={styles.filterIcon} />
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="graduated">Graduated</option>
-              <option value="dropped">Dropped</option>
-              <option value="transferred">Transferred</option>
-            </select>
-          </div>
-
-          <button className={styles.refreshBtn} onClick={fetchStudents}>
-            <FaSync /> Refresh
-          </button>
-        </div>
-
-        {/* Table Container - MUI Table with your styling */}
-        <StyledTableContainer component={Paper}>
-          {loading ? (
-            <div className={styles.loadingState}>
-              <div className={styles.spinner}></div>
-              <p>Loading students...</p>
-            </div>
-          ) : (
-            <>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    {headCells.map((headCell) => (
-                      <TableCell key={headCell.id}>
-                        {headCell.sortable ? (
-                          <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : "asc"}
-                            onClick={() => handleRequestSort(headCell.id)}
-                            sx={{ color: "white !important" }}
-                          >
-                            {headCell.label}
-                          </TableSortLabel>
-                        ) : (
-                          headCell.label
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {paginatedStudents.length > 0 ? (
-                    paginatedStudents.map((student) => (
-                      <TableRow
-                        key={student.id}
-                        hover
-                        onClick={() => handleViewDetails(student)}
-                        sx={{ cursor: "pointer" }}
-                      >
-                        <TableCell>
-                          <div className={styles.photoCell}>
-                            <img
-                              src={
-                                student.profile_photo &&
-                                student.profile_photo.trim() !== ""
-                                  ? student.profile_photo
-                                  : "/user.png"
+          {/* Table Container - MUI Table with your styling */}
+          <StyledTableContainer component={Paper}>
+            {loading ? (
+              <div className={styles.loadingState}>
+                <div className={styles.spinner}></div>
+                <p>Loading students...</p>
+              </div>
+            ) : (
+              <>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      {headCells.map((headCell) => (
+                        <TableCell key={headCell.id}>
+                          {headCell.sortable ? (
+                            <TableSortLabel
+                              active={orderBy === headCell.id}
+                              direction={
+                                orderBy === headCell.id ? order : "asc"
                               }
-                              alt={student.first_name}
-                              className={styles.studentPhoto}
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = "/user.png";
-                              }}
-                            />
-                          </div>
-                        </TableCell>
-
-                        <TableCell>
-                          <span className={styles.schoolId}>
-                            {student.school_id}
-                          </span>
-                        </TableCell>
-
-                        <TableCell>
-                          <div className={styles.studentName}>
-                            {student.first_name} {student.middle_name}{" "}
-                            {student.last_name} {student.suffix_name}
-                          </div>
-                        </TableCell>
-
-                        <TableCell>
-                          <div className={styles.genderCell}>
-                            {getGenderIcon(student.gender)}
-                            <span>{student.gender || "N/A"}</span>
-                          </div>
-                        </TableCell>
-
-                        <TableCell>{student.age || "N/A"}</TableCell>
-
-                        <TableCell>
-                          <div className={styles.contactCell}>
-                            <div>{student.contact_number || "N/A"}</div>
-                            <small>
-                              {student.address?.substring(0, 30)}...
-                            </small>
-                          </div>
-                        </TableCell>
-
-                        <TableCell>
-                          <div className={styles.guardianCell}>
-                            <div>{student.guardian_name || "N/A"}</div>
-                            <small>{student.guardian_contact || ""}</small>
-                          </div>
-                        </TableCell>
-
-                        <TableCell>
-                          <span
-                            className={`${styles.statusBadge} ${styles[`status${student.status?.charAt(0).toUpperCase() + student.status?.slice(1)}`]}`}
-                          >
-                            {student.status?.charAt(0).toUpperCase() +
-                              student.status?.slice(1)}
-                          </span>
-                        </TableCell>
-
-                        <TableCell>
-                          <div className={styles.actionButtons}>
-                            <button
-                              className={styles.editBtn}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEdit(student);
-                              }}
-                              title="Edit student"
+                              onClick={() => handleRequestSort(headCell.id)}
+                              sx={{ color: "white !important" }}
                             >
-                              <FaEdit />
-                            </button>
-                            <button
-                              className={styles.deleteBtn}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDelete(student.id);
-                              }}
-                              title="Delete student"
+                              {headCell.label}
+                            </TableSortLabel>
+                          ) : (
+                            headCell.label
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+
+                  <TableBody>
+                    {paginatedStudents.length > 0 ? (
+                      paginatedStudents.map((student) => (
+                        <TableRow
+                          key={student.id}
+                          hover
+                          onClick={() => handleViewDetails(student)}
+                          sx={{ cursor: "pointer" }}
+                        >
+                          <TableCell>
+                            <div className={styles.photoCell}>
+                              <img
+                                src={
+                                  student.profile_photo &&
+                                  student.profile_photo.trim() !== ""
+                                    ? student.profile_photo
+                                    : "/user.png"
+                                }
+                                alt={student.first_name}
+                                className={styles.studentPhoto}
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.src = "/user.png";
+                                }}
+                              />
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <span className={styles.schoolId}>
+                              {student.school_id}
+                            </span>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className={styles.studentName}>
+                              {student.first_name} {student.middle_name}{" "}
+                              {student.last_name} {student.suffix_name}
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className={styles.genderCell}>
+                              {getGenderIcon(student.gender)}
+                              <span>{student.gender || "N/A"}</span>
+                            </div>
+                          </TableCell>
+
+                          <TableCell>{student.age || "N/A"}</TableCell>
+
+                          <TableCell>
+                            <div className={styles.contactCell}>
+                              <div>{student.contact_number || "N/A"}</div>
+                              <small>
+                                {student.address?.substring(0, 30)}...
+                              </small>
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className={styles.guardianCell}>
+                              <div>{student.guardian_name || "N/A"}</div>
+                              <small>{student.guardian_contact || ""}</small>
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <span
+                              className={`${styles.statusBadge} ${styles[`status${student.status?.charAt(0).toUpperCase() + student.status?.slice(1)}`]}`}
                             >
-                              <FaTrash />
-                            </button>
+                              {student.status?.charAt(0).toUpperCase() +
+                                student.status?.slice(1)}
+                            </span>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className={styles.actionButtons}>
+                              <button
+                                className={styles.editBtn}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEdit(student);
+                                }}
+                                title="Edit student"
+                              >
+                                <FaEdit />
+                              </button>
+                              <button
+                                className={styles.deleteBtn}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(student.id);
+                                }}
+                                title="Delete student"
+                              >
+                                <FaTrash />
+                              </button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={9} className={styles.emptyState}>
+                          <div className={styles.emptyStateContent}>
+                            <img src="/empty-state.svg" alt="No students" />
+                            <h3>No students found</h3>
+                            <p>Try adjusting your search or filter criteria</p>
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={9} className={styles.emptyState}>
-                        <div className={styles.emptyStateContent}>
-                          <img src="/empty-state.svg" alt="No students" />
-                          <h3>No students found</h3>
-                          <p>Try adjusting your search or filter criteria</p>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-
-              {/* MUI Pagination */}
-              <TablePagination
-                rowsPerPageOptions={[10, 20, 50]}
-                component="div"
-                count={filteredStudents.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                sx={{
-                  borderTop: "1px solid rgba(0, 0, 0, 0.1)",
-                  ".MuiTablePagination-select": {
-                    borderRadius: "20px",
-                  },
-                }}
-              />
-            </>
-          )}
-        </StyledTableContainer>
-
-        {/* MODAL - Keep your original modal code */}
-        {showModal && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
-              <div className={styles.modalHeader}>
-                <h2>{editId ? "Edit Student" : "Add New Student"}</h2>
-                <button
-                  className={styles.closeBtn}
-                  onClick={() => setShowModal(false)}
-                >
-                  <FaTimes />
-                </button>
-              </div>
-
-              <div className={styles.modalBody}>
-                {/* Photo Upload Section */}
-                <div className={styles.photoUploadSection}>
-                  <div className={styles.photoPreview}>
-                    {previewImage ? (
-                      <img src={previewImage} alt="Preview" />
-                    ) : (
-                      <div className={styles.photoPlaceholder}>
-                        <FaCamera />
-                      </div>
                     )}
-                  </div>
-                  <div className={styles.uploadControls}>
-                    <label className={styles.uploadLabel}>
-                      <FaCamera /> Choose Photo
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        style={{ display: "none" }}
-                      />
-                    </label>
-                    {previewImage && (
-                      <button
-                        className={styles.removePhoto}
-                        onClick={() => {
-                          setForm({ ...form, profile_photo: "" });
-                          setPreviewImage(null);
-                        }}
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                </div>
+                  </TableBody>
+                </Table>
 
-                {/* Form Fields */}
-                <div className={styles.formGrid}>
-                  <div className={styles.formGroup}>
-                    <label>School ID</label>
-                    <input
-                      name="school_id"
-                      placeholder="Enter School ID"
-                      value={form.school_id}
-                      onChange={handleChange}
-                      disabled={editId}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>First Name</label>
-                    <input
-                      name="first_name"
-                      placeholder="Enter First Name"
-                      value={form.first_name}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Middle Name</label>
-                    <input
-                      name="middle_name"
-                      placeholder="Enter Middle Name"
-                      value={form.middle_name}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Last Name</label>
-                    <input
-                      name="last_name"
-                      placeholder="Enter Last Name"
-                      value={form.last_name}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Suffix</label>
-                    <input
-                      name="suffix_name"
-                      placeholder="Jr., III, etc."
-                      value={form.suffix_name}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formRow}>
-                    <div className={styles.formGroup}>
-                      <label>Age</label>
-                      <input
-                        name="age"
-                        type="number"
-                        placeholder="Age"
-                        value={form.age}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                      <label>Birthdate</label>
-                      <input
-                        name="birthdate"
-                        type="date"
-                        value={form.birthdate}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Gender</label>
-                    <select
-                      name="gender"
-                      value={form.gender}
-                      onChange={handleChange}
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Contact Number</label>
-                    <input
-                      name="contact_number"
-                      placeholder="Enter Contact Number"
-                      value={form.contact_number}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Address</label>
-                    <textarea
-                      name="address"
-                      placeholder="Enter Complete Address"
-                      value={form.address}
-                      onChange={handleChange}
-                      rows="3"
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Guardian Name</label>
-                    <input
-                      name="guardian_name"
-                      placeholder="Enter Guardian Name"
-                      value={form.guardian_name}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Guardian Contact</label>
-                    <input
-                      name="guardian_contact"
-                      placeholder="Enter Guardian Contact"
-                      value={form.guardian_contact}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Status</label>
-                    <select
-                      name="status"
-                      value={form.status}
-                      onChange={handleChange}
-                    >
-                      <option value="active">Active</option>
-                      <option value="graduated">Graduated</option>
-                      <option value="dropped">Dropped</option>
-                      <option value="transferred">Transferred</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.modalFooter}>
-                <button
-                  className={styles.cancelBtn}
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
-                </button>
-                <button className={styles.saveBtn} onClick={handleSubmit}>
-                  {editId ? "Update Student" : "Save Student"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Student Details Modal */}
-        {selectedStudent && !showModal && (
-          <div
-            className={styles.modalOverlay}
-            onClick={() => setSelectedStudent(null)}
-          >
-            <div
-              className={styles.detailsModal}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className={styles.modalHeader}>
-                <h2>Student Details</h2>
-                <button
-                  className={styles.closeBtn}
-                  onClick={() => setSelectedStudent(null)}
-                >
-                  <FaTimes />
-                </button>
-              </div>
-
-              <div className={styles.detailsContent}>
-                <div className={styles.detailsAvatar}>
-                  <img
-                    src={selectedStudent.profile_photo || "/default-avatar.png"}
-                    alt={selectedStudent.first_name}
-                  />
-                </div>
-
-                <div className={styles.detailsInfo}>
-                  <h3>
-                    {selectedStudent.first_name} {selectedStudent.last_name}
-                  </h3>
-                  <p className={styles.detailsSchoolId}>
-                    ID: {selectedStudent.school_id}
-                  </p>
-
-                  <div className={styles.detailsGrid}>
-                    <div className={styles.detailItem}>
-                      <label>Gender</label>
-                      <span>{selectedStudent.gender || "N/A"}</span>
-                    </div>
-                    <div className={styles.detailItem}>
-                      <label>Age</label>
-                      <span>{selectedStudent.age || "N/A"}</span>
-                    </div>
-                    <div className={styles.detailItem}>
-                      <label>Birthdate</label>
-                      <span>
-                        {selectedStudent.birthdate
-                          ? new Date(
-                              selectedStudent.birthdate,
-                            ).toLocaleDateString()
-                          : "N/A"}
-                      </span>
-                    </div>
-                    <div className={styles.detailItem}>
-                      <label>Contact</label>
-                      <span>{selectedStudent.contact_number || "N/A"}</span>
-                    </div>
-                    <div className={styles.detailItem}>
-                      <label>Address</label>
-                      <span>{selectedStudent.address || "N/A"}</span>
-                    </div>
-                    <div className={styles.detailItem}>
-                      <label>Guardian</label>
-                      <span>{selectedStudent.guardian_name || "N/A"}</span>
-                    </div>
-                    <div className={styles.detailItem}>
-                      <label>Guardian Contact</label>
-                      <span>{selectedStudent.guardian_contact || "N/A"}</span>
-                    </div>
-                    <div className={styles.detailItem}>
-                      <label>Status</label>
-                      <span
-                        className={`${styles.statusBadge} ${styles[`status${selectedStudent.status?.charAt(0).toUpperCase() + selectedStudent.status?.slice(1)}`]}`}
-                      >
-                        {selectedStudent.status}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.modalFooter}>
-                <button
-                  className={styles.editBtn}
-                  onClick={() => {
-                    handleEdit(selectedStudent);
-                    setSelectedStudent(null);
+                {/* MUI Pagination */}
+                <TablePagination
+                  rowsPerPageOptions={[10, 20, 50]}
+                  component="div"
+                  count={filteredStudents.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  sx={{
+                    borderTop: "1px solid rgba(0, 0, 0, 0.1)",
+                    ".MuiTablePagination-select": {
+                      borderRadius: "20px",
+                    },
                   }}
-                >
-                  <FaEdit /> Edit Student
-                </button>
-                <button
-                  className={styles.cancelBtn}
-                  onClick={() => setSelectedStudent(null)}
-                >
-                  Close
-                </button>
+                />
+              </>
+            )}
+          </StyledTableContainer>
+
+          {/* MODAL - Keep your original modal code */}
+          {showModal && (
+            <div className={styles.modalOverlay}>
+              <div className={styles.modal}>
+                <div className={styles.modalHeader}>
+                  <h2>{editId ? "Edit Student" : "Add New Student"}</h2>
+                  <button
+                    className={styles.closeBtn}
+                    onClick={() => setShowModal(false)}
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
+
+                <div className={styles.modalBody}>
+                  {/* Photo Upload Section */}
+                  <div className={styles.photoUploadSection}>
+                    <div className={styles.photoPreview}>
+                      {previewImage ? (
+                        <img src={previewImage} alt="Preview" />
+                      ) : (
+                        <div className={styles.photoPlaceholder}>
+                          <FaCamera />
+                        </div>
+                      )}
+                    </div>
+                    <div className={styles.uploadControls}>
+                      <label className={styles.uploadLabel}>
+                        <FaCamera /> Choose Photo
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          style={{ display: "none" }}
+                        />
+                      </label>
+                      {previewImage && (
+                        <button
+                          className={styles.removePhoto}
+                          onClick={() => {
+                            setForm({ ...form, profile_photo: "" });
+                            setPreviewImage(null);
+                          }}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Form Fields */}
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label>School ID</label>
+                      <input
+                        name="school_id"
+                        placeholder="Enter School ID"
+                        value={form.school_id}
+                        onChange={handleChange}
+                        disabled={editId}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>First Name</label>
+                      <input
+                        name="first_name"
+                        placeholder="Enter First Name"
+                        value={form.first_name}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Middle Name</label>
+                      <input
+                        name="middle_name"
+                        placeholder="Enter Middle Name"
+                        value={form.middle_name}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Last Name</label>
+                      <input
+                        name="last_name"
+                        placeholder="Enter Last Name"
+                        value={form.last_name}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Suffix</label>
+                      <input
+                        name="suffix_name"
+                        placeholder="Jr., III, etc."
+                        value={form.suffix_name}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formRow}>
+                      <div className={styles.formGroup}>
+                        <label>Age</label>
+                        <input
+                          name="age"
+                          type="number"
+                          placeholder="Age"
+                          value={form.age}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label>Birthdate</label>
+                        <input
+                          name="birthdate"
+                          type="date"
+                          value={form.birthdate}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Gender</label>
+                      <select
+                        name="gender"
+                        value={form.gender}
+                        onChange={handleChange}
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Contact Number</label>
+                      <input
+                        name="contact_number"
+                        placeholder="Enter Contact Number"
+                        value={form.contact_number}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Address</label>
+                      <textarea
+                        name="address"
+                        placeholder="Enter Complete Address"
+                        value={form.address}
+                        onChange={handleChange}
+                        rows="3"
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Guardian Name</label>
+                      <input
+                        name="guardian_name"
+                        placeholder="Enter Guardian Name"
+                        value={form.guardian_name}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Guardian Contact</label>
+                      <input
+                        name="guardian_contact"
+                        placeholder="Enter Guardian Contact"
+                        value={form.guardian_contact}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Status</label>
+                      <select
+                        name="status"
+                        value={form.status}
+                        onChange={handleChange}
+                      >
+                        <option value="active">Active</option>
+                        <option value="graduated">Graduated</option>
+                        <option value="dropped">Dropped</option>
+                        <option value="transferred">Transferred</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.modalFooter}>
+                  <button
+                    className={styles.cancelBtn}
+                    onClick={() => setShowModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button className={styles.saveBtn} onClick={handleSubmit}>
+                    {editId ? "Update Student" : "Save Student"}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    </ThemeProvider>
+          )}
+
+          {/* Student Details Modal */}
+          {selectedStudent && !showModal && (
+            <div
+              className={styles.modalOverlay}
+              onClick={() => setSelectedStudent(null)}
+            >
+              <div
+                className={styles.detailsModal}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className={styles.modalHeader}>
+                  <h2>Student Details</h2>
+                  <button
+                    className={styles.closeBtn}
+                    onClick={() => setSelectedStudent(null)}
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
+
+                <div className={styles.detailsContent}>
+                  <div className={styles.detailsAvatar}>
+                    <img
+                      src={
+                        selectedStudent.profile_photo || "/default-avatar.png"
+                      }
+                      alt={selectedStudent.first_name}
+                    />
+                  </div>
+
+                  <div className={styles.detailsInfo}>
+                    <h3>
+                      {selectedStudent.first_name} {selectedStudent.last_name}
+                    </h3>
+                    <p className={styles.detailsSchoolId}>
+                      ID: {selectedStudent.school_id}
+                    </p>
+
+                    <div className={styles.detailsGrid}>
+                      <div className={styles.detailItem}>
+                        <label>Gender</label>
+                        <span>{selectedStudent.gender || "N/A"}</span>
+                      </div>
+                      <div className={styles.detailItem}>
+                        <label>Age</label>
+                        <span>{selectedStudent.age || "N/A"}</span>
+                      </div>
+                      <div className={styles.detailItem}>
+                        <label>Birthdate</label>
+                        <span>
+                          {selectedStudent.birthdate
+                            ? new Date(
+                                selectedStudent.birthdate,
+                              ).toLocaleDateString()
+                            : "N/A"}
+                        </span>
+                      </div>
+                      <div className={styles.detailItem}>
+                        <label>Contact</label>
+                        <span>{selectedStudent.contact_number || "N/A"}</span>
+                      </div>
+                      <div className={styles.detailItem}>
+                        <label>Address</label>
+                        <span>{selectedStudent.address || "N/A"}</span>
+                      </div>
+                      <div className={styles.detailItem}>
+                        <label>Guardian</label>
+                        <span>{selectedStudent.guardian_name || "N/A"}</span>
+                      </div>
+                      <div className={styles.detailItem}>
+                        <label>Guardian Contact</label>
+                        <span>{selectedStudent.guardian_contact || "N/A"}</span>
+                      </div>
+                      <div className={styles.detailItem}>
+                        <label>Status</label>
+                        <span
+                          className={`${styles.statusBadge} ${styles[`status${selectedStudent.status?.charAt(0).toUpperCase() + selectedStudent.status?.slice(1)}`]}`}
+                        >
+                          {selectedStudent.status}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.modalFooter}>
+                  <button
+                    className={styles.editBtn}
+                    onClick={() => {
+                      handleEdit(selectedStudent);
+                      setSelectedStudent(null);
+                    }}
+                  >
+                    <FaEdit /> Edit Student
+                  </button>
+                  <button
+                    className={styles.cancelBtn}
+                    onClick={() => setSelectedStudent(null)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </ThemeProvider>
+    </>
   );
 };
 

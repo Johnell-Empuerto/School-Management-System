@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../services/api";
 import styles from "../assets/styles/EnrollmentRequests.module.css";
 import { Helmet } from "react-helmet-async";
 
@@ -155,8 +155,6 @@ function EnrollmentRequests() {
   const [orderBy, setOrderBy] = useState("created_at");
   const [order, setOrder] = useState("desc");
 
-  const API = "http://localhost:3001/api";
-
   useEffect(() => {
     fetchRequests();
   }, []);
@@ -199,7 +197,7 @@ function EnrollmentRequests() {
   const fetchRequests = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/enrollment-requests`);
+      const res = await api.get("/enrollment-requests");
       setRequests(res.data);
       setFilteredRequests(res.data.filter((r) => r.status === "pending"));
     } catch (error) {
@@ -218,7 +216,7 @@ function EnrollmentRequests() {
       )
         return;
 
-      await axios.put(`${API}/enrollment-requests/approve/${id}`);
+      await api.put(`/enrollment-requests/approve/${id}`);
       fetchRequests();
     } catch (err) {
       alert(err.response?.data?.message || "Failed to approve request");
@@ -234,7 +232,7 @@ function EnrollmentRequests() {
       )
         return;
 
-      await axios.put(`${API}/enrollment-requests/reject/${id}`);
+      await api.put(`/enrollment-requests/reject/${id}`);
       fetchRequests();
     } catch (err) {
       alert(err.response?.data?.message || "Failed to reject request");

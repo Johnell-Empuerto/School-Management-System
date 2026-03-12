@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import styles from "../assets/styles/Attendance.module.css";
 import { Helmet } from "react-helmet-async";
 
@@ -30,8 +30,6 @@ function Attendance() {
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year] = useState(new Date().getFullYear());
   const [selectedClass, setSelectedClass] = useState(null);
-
-  const API = "http://localhost:3001/api";
 
   const months = [
     "January",
@@ -66,7 +64,7 @@ function Attendance() {
   const fetchClassSubjects = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/class-subjects`);
+      const res = await api.get("/class-subjects");
       setClassSubjects(res.data);
     } catch (error) {
       console.error("Error fetching class subjects:", error);
@@ -78,8 +76,8 @@ function Attendance() {
   const fetchAttendance = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(
-        `${API}/attendance/${classSubjectId}/${month}/${year}`,
+      const res = await api.get(
+        `/attendance/${classSubjectId}/${month}/${year}`,
       );
       setAttendance(res.data);
     } catch (error) {
@@ -100,7 +98,7 @@ function Attendance() {
     const next =
       statusCycle[(statusCycle.indexOf(current) + 1) % statusCycle.length];
 
-    await axios.post(`${API}/attendance`, {
+    await api.post("/attendance", {
       enrollment_id: student.enrollment_id,
       class_subject_id: classSubjectId,
       date,

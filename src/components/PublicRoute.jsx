@@ -1,20 +1,22 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import api from "../services/api";
 
 function PublicRoute({ children }) {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/me", {
-      credentials: "include",
-    })
+    api
+      .get("/me")
       .then((res) => {
-        if (res.ok) {
+        if (res.status === 200) {
           setAuthenticated(true);
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        // Handle error silently - user is not authenticated
+      })
       .finally(() => setLoading(false));
   }, []);
 

@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../services/api";
 import styles from "../assets/styles/Teachers.module.css";
+import { Helmet } from "react-helmet-async";
 import {
   FaSearch,
   FaFilter,
@@ -149,8 +150,6 @@ function Teachers() {
     profile_photo: "",
   });
 
-  const API = "http://localhost:3001/api";
-
   useEffect(() => {
     fetchTeachers();
   }, []);
@@ -194,7 +193,7 @@ function Teachers() {
   const fetchTeachers = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/teachers`);
+      const res = await api.get("/teachers");
       setTeachers(res.data);
       setFilteredTeachers(res.data);
     } catch (error) {
@@ -266,7 +265,7 @@ function Teachers() {
 
   const addTeacher = async () => {
     try {
-      await axios.post(`${API}/teachers`, formData);
+      await api.post("/teachers", formData);
 
       setFormData({
         school_id: "",
@@ -314,7 +313,7 @@ function Teachers() {
   const updateTeacher = async () => {
     // Create a copy of formData without school_id for the update
     const { school_id, ...updateData } = formData;
-    await axios.put(`${API}/teachers/${editTeacher.id}`, updateData);
+    await api.put(`/teachers/${editTeacher.id}`, updateData);
 
     setShowModal(false);
     setEditTeacher(null);
@@ -342,7 +341,7 @@ function Teachers() {
   };
 
   const updateTeacherStatus = async (id, status) => {
-    await axios.put(`${API}/teachers/${id}/status`, { status });
+    await api.put(`/teachers/${id}/status`, { status });
     fetchTeachers();
   };
 
@@ -389,570 +388,580 @@ function Teachers() {
   ];
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className={styles.teachersContainer}>
-        <div className={styles.header}>
-          <div className={styles.headerTitle}>
-            <h1>Teachers Management</h1>
-            <p>Manage and track all teacher information</p>
-          </div>
-          <div className={styles.headerActions}>
-            <button
-              className={styles.addBtn}
-              onClick={() => {
-                setEditTeacher(null);
-                setFormData({
-                  school_id: "",
-                  first_name: "",
-                  middle_name: "",
-                  last_name: "",
-                  suffix_name: "",
-                  gender: "",
-                  birthdate: "",
-                  contact_number: "",
-                  email: "",
-                  address: "",
-                  department: "",
-                  rank_level: "",
-                  specialization: "",
-                  hire_date: "",
-                  employment_type: "",
-                  highest_education: "",
-                  age: "",
-                  profile_photo: "",
-                });
-                setShowModal(true);
-              }}
-            >
-              <FaUserPlus /> Add Teacher
-            </button>
-          </div>
-        </div>
+    <>
+      <Helmet>
+        <title>Teachers | School Management System</title>
+      </Helmet>
 
-        {/* Search and Filter Bar - Using your original CSS */}
-        <div className={styles.controls}>
-          <div className={styles.searchBox}>
-            <FaSearch className={styles.searchIcon} />
-            <input
-              type="text"
-              placeholder="Search by name, ID, department, or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            {searchTerm && (
+      <ThemeProvider theme={theme}>
+        <div className={styles.teachersContainer}>
+          <div className={styles.header}>
+            <div className={styles.headerTitle}>
+              <h1>Teachers Management</h1>
+              <p>Manage and track all teacher information</p>
+            </div>
+            <div className={styles.headerActions}>
               <button
-                className={styles.clearSearch}
-                onClick={() => setSearchTerm("")}
-              >
-                <FaTimes />
-              </button>
-            )}
-          </div>
-
-          <div className={styles.filterBox}>
-            <FaFilter className={styles.filterIcon} />
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="leave">On Leave</option>
-              <option value="maternity_leave">Maternity Leave</option>
-              <option value="retired">Retired</option>
-              <option value="resigned">Resigned</option>
-            </select>
-          </div>
-
-          {departments.length > 0 && (
-            <div className={styles.filterBox}>
-              <FaFilter className={styles.filterIcon} />
-              <select
-                value={filterDepartment}
-                onChange={(e) => setFilterDepartment(e.target.value)}
-              >
-                <option value="all">All Departments</option>
-                {departments.map((dept) => (
-                  <option key={dept} value={dept}>
-                    {dept}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <button className={styles.refreshBtn} onClick={fetchTeachers}>
-            <FaSync /> Refresh
-          </button>
-        </div>
-
-        {/* Table Container - MUI Table */}
-        <StyledTableContainer component={Paper}>
-          {loading ? (
-            <div className={styles.loadingState}>
-              <div className={styles.spinner}></div>
-              <p>Loading teachers...</p>
-            </div>
-          ) : (
-            <>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    {headCells.map((headCell) => (
-                      <TableCell key={headCell.id}>
-                        {headCell.sortable ? (
-                          <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : "asc"}
-                            onClick={() => handleRequestSort(headCell.id)}
-                            sx={{ color: "white !important" }}
-                          >
-                            {headCell.label}
-                          </TableSortLabel>
-                        ) : (
-                          headCell.label
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {paginatedTeachers.length > 0 ? (
-                    paginatedTeachers.map((teacher) => (
-                      <TableRow key={teacher.id} hover>
-                        <TableCell>
-                          <div className={styles.photoCell}>
-                            <img
-                              src={teacher.profile_photo?.trim() || "/user.png"}
-                              alt="profile"
-                              className={styles.teacherPhoto}
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = "/user.png";
-                              }}
-                            />
-                          </div>
-                        </TableCell>
-
-                        <TableCell>
-                          <span className={styles.schoolId}>
-                            {teacher.school_id}
-                          </span>
-                        </TableCell>
-
-                        <TableCell>
-                          <div className={styles.teacherName}>
-                            {teacher.first_name} {teacher.middle_name}
-                          </div>
-                        </TableCell>
-
-                        <TableCell>{teacher.last_name}</TableCell>
-
-                        <TableCell>
-                          <div className={styles.departmentCell}>
-                            {teacher.department}
-                          </div>
-                        </TableCell>
-
-                        <TableCell>
-                          <span className={styles.rankLevel}>
-                            {teacher.rank_level}
-                          </span>
-                        </TableCell>
-
-                        <TableCell className={styles.ageCell}>
-                          {teacher.age}
-                        </TableCell>
-
-                        <TableCell className={styles.birthdayCell}>
-                          {formatDate(teacher.birthdate)}
-                        </TableCell>
-
-                        <TableCell>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: "5px",
-                            }}
-                          >
-                            <Chip
-                              label={teacher.status?.replace("_", " ")}
-                              color={getStatusColor(teacher.status)}
-                              size="small"
-                              sx={{
-                                fontWeight: 600,
-                                textTransform: "capitalize",
-                              }}
-                            />
-                            <FormControl size="small" sx={{ minWidth: 120 }}>
-                              <Select
-                                value={teacher.status}
-                                onChange={(e) =>
-                                  updateTeacherStatus(
-                                    teacher.id,
-                                    e.target.value,
-                                  )
-                                }
-                                sx={{
-                                  borderRadius: "20px",
-                                  fontSize: "0.8rem",
-                                  height: "32px",
-                                }}
-                              >
-                                <MenuItem value="active">Active</MenuItem>
-                                <MenuItem value="leave">On Leave</MenuItem>
-                                <MenuItem value="maternity_leave">
-                                  Maternity Leave
-                                </MenuItem>
-                                <MenuItem value="retired">Retired</MenuItem>
-                                <MenuItem value="resigned">Resigned</MenuItem>
-                              </Select>
-                            </FormControl>
-                          </div>
-                        </TableCell>
-
-                        <TableCell>
-                          <div className={styles.actionButtons}>
-                            <Tooltip title="Edit Teacher">
-                              <button
-                                className={styles.editBtn}
-                                onClick={() => openEditModal(teacher)}
-                              >
-                                <FaEdit />
-                              </button>
-                            </Tooltip>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={10} className={styles.emptyState}>
-                        <div className={styles.emptyStateContent}>
-                          <h3>No teachers found</h3>
-                          <p>Try adjusting your search or filter criteria</p>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-
-              {/* Pagination */}
-              <TablePagination
-                rowsPerPageOptions={[10, 20, 50]}
-                component="div"
-                count={filteredTeachers.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                sx={{
-                  borderTop: "1px solid rgba(0, 0, 0, 0.1)",
-                  ".MuiTablePagination-select": {
-                    borderRadius: "20px",
-                  },
+                className={styles.addBtn}
+                onClick={() => {
+                  setEditTeacher(null);
+                  setFormData({
+                    school_id: "",
+                    first_name: "",
+                    middle_name: "",
+                    last_name: "",
+                    suffix_name: "",
+                    gender: "",
+                    birthdate: "",
+                    contact_number: "",
+                    email: "",
+                    address: "",
+                    department: "",
+                    rank_level: "",
+                    specialization: "",
+                    hire_date: "",
+                    employment_type: "",
+                    highest_education: "",
+                    age: "",
+                    profile_photo: "",
+                  });
+                  setShowModal(true);
                 }}
-              />
-            </>
-          )}
-        </StyledTableContainer>
+              >
+                <FaUserPlus /> Add Teacher
+              </button>
+            </div>
+          </div>
 
-        {/* MODAL - Keep your original modal code */}
-        {showModal && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
-              <div className={styles.modalHeader}>
-                <h2>{editTeacher ? "Edit Teacher" : "Add Teacher"}</h2>
+          {/* Search and Filter Bar - Using your original CSS */}
+          <div className={styles.controls}>
+            <div className={styles.searchBox}>
+              <FaSearch className={styles.searchIcon} />
+              <input
+                type="text"
+                placeholder="Search by name, ID, department, or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
                 <button
-                  className={styles.closeBtn}
-                  onClick={() => {
-                    setShowModal(false);
-                    setEditTeacher(null);
-                    setFormData({
-                      school_id: "",
-                      first_name: "",
-                      last_name: "",
-                      department: "",
-                      rank_level: "",
-                      age: "",
-                    });
-                  }}
+                  className={styles.clearSearch}
+                  onClick={() => setSearchTerm("")}
                 >
                   <FaTimes />
                 </button>
+              )}
+            </div>
+
+            <div className={styles.filterBox}>
+              <FaFilter className={styles.filterIcon} />
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="leave">On Leave</option>
+                <option value="maternity_leave">Maternity Leave</option>
+                <option value="retired">Retired</option>
+                <option value="resigned">Resigned</option>
+              </select>
+            </div>
+
+            {departments.length > 0 && (
+              <div className={styles.filterBox}>
+                <FaFilter className={styles.filterIcon} />
+                <select
+                  value={filterDepartment}
+                  onChange={(e) => setFilterDepartment(e.target.value)}
+                >
+                  <option value="all">All Departments</option>
+                  {departments.map((dept) => (
+                    <option key={dept} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
+                </select>
               </div>
+            )}
 
-              <div className={styles.modalBody}>
-                {/* School ID field - only show in add mode */}
-                {!editTeacher && (
-                  <div className={styles.formGroup}>
-                    <label>School ID</label>
-                    <input
-                      type="text"
-                      name="school_id"
-                      placeholder="Enter School ID"
-                      value={formData.school_id}
-                      onChange={handleChange}
-                    />
-                  </div>
-                )}
+            <button className={styles.refreshBtn} onClick={fetchTeachers}>
+              <FaSync /> Refresh
+            </button>
+          </div>
 
-                {/* Show school_id as read-only in edit mode */}
-                {editTeacher && (
-                  <div className={styles.readonlyField}>
-                    <label>School ID:</label>
-                    <span>{formData.school_id}</span>
-                  </div>
-                )}
+          {/* Table Container - MUI Table */}
+          <StyledTableContainer component={Paper}>
+            {loading ? (
+              <div className={styles.loadingState}>
+                <div className={styles.spinner}></div>
+                <p>Loading teachers...</p>
+              </div>
+            ) : (
+              <>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      {headCells.map((headCell) => (
+                        <TableCell key={headCell.id}>
+                          {headCell.sortable ? (
+                            <TableSortLabel
+                              active={orderBy === headCell.id}
+                              direction={
+                                orderBy === headCell.id ? order : "asc"
+                              }
+                              onClick={() => handleRequestSort(headCell.id)}
+                              sx={{ color: "white !important" }}
+                            >
+                              {headCell.label}
+                            </TableSortLabel>
+                          ) : (
+                            headCell.label
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
 
-                {/* Photo Upload */}
-                <div className={styles.photoUploadSection}>
-                  <div className={styles.photoPreview}>
-                    {formData.profile_photo ? (
-                      <img src={formData.profile_photo} alt="Preview" />
+                  <TableBody>
+                    {paginatedTeachers.length > 0 ? (
+                      paginatedTeachers.map((teacher) => (
+                        <TableRow key={teacher.id} hover>
+                          <TableCell>
+                            <div className={styles.photoCell}>
+                              <img
+                                src={
+                                  teacher.profile_photo?.trim() || "/user.png"
+                                }
+                                alt="profile"
+                                className={styles.teacherPhoto}
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.src = "/user.png";
+                                }}
+                              />
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <span className={styles.schoolId}>
+                              {teacher.school_id}
+                            </span>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className={styles.teacherName}>
+                              {teacher.first_name} {teacher.middle_name}
+                            </div>
+                          </TableCell>
+
+                          <TableCell>{teacher.last_name}</TableCell>
+
+                          <TableCell>
+                            <div className={styles.departmentCell}>
+                              {teacher.department}
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <span className={styles.rankLevel}>
+                              {teacher.rank_level}
+                            </span>
+                          </TableCell>
+
+                          <TableCell className={styles.ageCell}>
+                            {teacher.age}
+                          </TableCell>
+
+                          <TableCell className={styles.birthdayCell}>
+                            {formatDate(teacher.birthdate)}
+                          </TableCell>
+
+                          <TableCell>
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "5px",
+                              }}
+                            >
+                              <Chip
+                                label={teacher.status?.replace("_", " ")}
+                                color={getStatusColor(teacher.status)}
+                                size="small"
+                                sx={{
+                                  fontWeight: 600,
+                                  textTransform: "capitalize",
+                                }}
+                              />
+                              <FormControl size="small" sx={{ minWidth: 120 }}>
+                                <Select
+                                  value={teacher.status}
+                                  onChange={(e) =>
+                                    updateTeacherStatus(
+                                      teacher.id,
+                                      e.target.value,
+                                    )
+                                  }
+                                  sx={{
+                                    borderRadius: "20px",
+                                    fontSize: "0.8rem",
+                                    height: "32px",
+                                  }}
+                                >
+                                  <MenuItem value="active">Active</MenuItem>
+                                  <MenuItem value="leave">On Leave</MenuItem>
+                                  <MenuItem value="maternity_leave">
+                                    Maternity Leave
+                                  </MenuItem>
+                                  <MenuItem value="retired">Retired</MenuItem>
+                                  <MenuItem value="resigned">Resigned</MenuItem>
+                                </Select>
+                              </FormControl>
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className={styles.actionButtons}>
+                              <Tooltip title="Edit Teacher">
+                                <button
+                                  className={styles.editBtn}
+                                  onClick={() => openEditModal(teacher)}
+                                >
+                                  <FaEdit />
+                                </button>
+                              </Tooltip>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
                     ) : (
-                      <div className={styles.photoPlaceholder}>📷</div>
+                      <TableRow>
+                        <TableCell colSpan={10} className={styles.emptyState}>
+                          <div className={styles.emptyStateContent}>
+                            <h3>No teachers found</h3>
+                            <p>Try adjusting your search or filter criteria</p>
+                          </div>
+                        </TableCell>
+                      </TableRow>
                     )}
-                  </div>
-                  <div className={styles.uploadControls}>
-                    <label className={styles.uploadLabel}>
-                      📤 Upload Photo
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        style={{ display: "none" }}
-                      />
-                    </label>
-                    {formData.profile_photo && (
-                      <button
-                        className={styles.removePhoto}
-                        onClick={() =>
-                          setFormData({ ...formData, profile_photo: "" })
-                        }
-                      >
-                        🗑️ Remove
-                      </button>
-                    )}
-                  </div>
-                </div>
+                  </TableBody>
+                </Table>
 
-                <div className={styles.formGrid}>
-                  <div className={styles.formGroup}>
-                    <label>First Name</label>
-                    <input
-                      type="text"
-                      name="first_name"
-                      placeholder="Enter first name"
-                      value={formData.first_name}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Middle Name</label>
-                    <input
-                      type="text"
-                      name="middle_name"
-                      placeholder="Enter middle name"
-                      value={formData.middle_name}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Last Name</label>
-                    <input
-                      type="text"
-                      name="last_name"
-                      placeholder="Enter last name"
-                      value={formData.last_name}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Suffix</label>
-                    <input
-                      type="text"
-                      name="suffix_name"
-                      placeholder="Jr., III, etc."
-                      value={formData.suffix_name}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Gender</label>
-                    <select
-                      name="gender"
-                      value={formData.gender}
-                      onChange={handleChange}
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                    </select>
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Birthdate</label>
-                    <input
-                      type="date"
-                      name="birthdate"
-                      value={formData.birthdate}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Age</label>
-                    <input
-                      type="number"
-                      name="age"
-                      placeholder="Enter age"
-                      value={formData.age}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Contact Number</label>
-                    <input
-                      type="text"
-                      name="contact_number"
-                      placeholder="Enter contact number"
-                      value={formData.contact_number}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Enter email address"
-                      value={formData.email}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Address</label>
-                    <textarea
-                      name="address"
-                      placeholder="Enter complete address"
-                      value={formData.address}
-                      onChange={handleChange}
-                      rows="2"
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Department</label>
-                    <input
-                      type="text"
-                      name="department"
-                      placeholder="Enter department"
-                      value={formData.department}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Rank Level</label>
-                    <input
-                      type="text"
-                      name="rank_level"
-                      placeholder="Enter rank level"
-                      value={formData.rank_level}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Specialization</label>
-                    <input
-                      type="text"
-                      name="specialization"
-                      placeholder="Enter specialization"
-                      value={formData.specialization}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Hire Date</label>
-                    <input
-                      type="date"
-                      name="hire_date"
-                      value={formData.hire_date}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Employment Type</label>
-                    <select
-                      name="employment_type"
-                      value={formData.employment_type}
-                      onChange={handleChange}
-                    >
-                      <option value="">Select Type</option>
-                      <option value="full_time">Full Time</option>
-                      <option value="part_time">Part Time</option>
-                      <option value="contract">Contract</option>
-                      <option value="probationary">Probationary</option>
-                    </select>
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Highest Education</label>
-                    <input
-                      type="text"
-                      name="highest_education"
-                      placeholder="Enter highest education"
-                      value={formData.highest_education}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.modalFooter}>
-                <button
-                  className={styles.cancelBtn}
-                  onClick={() => {
-                    setShowModal(false);
-                    setEditTeacher(null);
-                    setFormData({
-                      school_id: "",
-                      first_name: "",
-                      last_name: "",
-                      department: "",
-                      rank_level: "",
-                      age: "",
-                    });
+                {/* Pagination */}
+                <TablePagination
+                  rowsPerPageOptions={[10, 20, 50]}
+                  component="div"
+                  count={filteredTeachers.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  sx={{
+                    borderTop: "1px solid rgba(0, 0, 0, 0.1)",
+                    ".MuiTablePagination-select": {
+                      borderRadius: "20px",
+                    },
                   }}
-                >
-                  Cancel
-                </button>
-                <button
-                  className={styles.saveBtn}
-                  onClick={editTeacher ? updateTeacher : addTeacher}
-                >
-                  {editTeacher ? "Update Teacher" : "Save Teacher"}
-                </button>
+                />
+              </>
+            )}
+          </StyledTableContainer>
+
+          {/* MODAL - Keep your original modal code */}
+          {showModal && (
+            <div className={styles.modalOverlay}>
+              <div className={styles.modal}>
+                <div className={styles.modalHeader}>
+                  <h2>{editTeacher ? "Edit Teacher" : "Add Teacher"}</h2>
+                  <button
+                    className={styles.closeBtn}
+                    onClick={() => {
+                      setShowModal(false);
+                      setEditTeacher(null);
+                      setFormData({
+                        school_id: "",
+                        first_name: "",
+                        last_name: "",
+                        department: "",
+                        rank_level: "",
+                        age: "",
+                      });
+                    }}
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
+
+                <div className={styles.modalBody}>
+                  {/* School ID field - only show in add mode */}
+                  {!editTeacher && (
+                    <div className={styles.formGroup}>
+                      <label>School ID</label>
+                      <input
+                        type="text"
+                        name="school_id"
+                        placeholder="Enter School ID"
+                        value={formData.school_id}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  )}
+
+                  {/* Show school_id as read-only in edit mode */}
+                  {editTeacher && (
+                    <div className={styles.readonlyField}>
+                      <label>School ID:</label>
+                      <span>{formData.school_id}</span>
+                    </div>
+                  )}
+
+                  {/* Photo Upload */}
+                  <div className={styles.photoUploadSection}>
+                    <div className={styles.photoPreview}>
+                      {formData.profile_photo ? (
+                        <img src={formData.profile_photo} alt="Preview" />
+                      ) : (
+                        <div className={styles.photoPlaceholder}>📷</div>
+                      )}
+                    </div>
+                    <div className={styles.uploadControls}>
+                      <label className={styles.uploadLabel}>
+                        📤 Upload Photo
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          style={{ display: "none" }}
+                        />
+                      </label>
+                      {formData.profile_photo && (
+                        <button
+                          className={styles.removePhoto}
+                          onClick={() =>
+                            setFormData({ ...formData, profile_photo: "" })
+                          }
+                        >
+                          🗑️ Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label>First Name</label>
+                      <input
+                        type="text"
+                        name="first_name"
+                        placeholder="Enter first name"
+                        value={formData.first_name}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Middle Name</label>
+                      <input
+                        type="text"
+                        name="middle_name"
+                        placeholder="Enter middle name"
+                        value={formData.middle_name}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Last Name</label>
+                      <input
+                        type="text"
+                        name="last_name"
+                        placeholder="Enter last name"
+                        value={formData.last_name}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Suffix</label>
+                      <input
+                        type="text"
+                        name="suffix_name"
+                        placeholder="Jr., III, etc."
+                        value={formData.suffix_name}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Gender</label>
+                      <select
+                        name="gender"
+                        value={formData.gender}
+                        onChange={handleChange}
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                      </select>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Birthdate</label>
+                      <input
+                        type="date"
+                        name="birthdate"
+                        value={formData.birthdate}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Age</label>
+                      <input
+                        type="number"
+                        name="age"
+                        placeholder="Enter age"
+                        value={formData.age}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Contact Number</label>
+                      <input
+                        type="text"
+                        name="contact_number"
+                        placeholder="Enter contact number"
+                        value={formData.contact_number}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="Enter email address"
+                        value={formData.email}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Address</label>
+                      <textarea
+                        name="address"
+                        placeholder="Enter complete address"
+                        value={formData.address}
+                        onChange={handleChange}
+                        rows="2"
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Department</label>
+                      <input
+                        type="text"
+                        name="department"
+                        placeholder="Enter department"
+                        value={formData.department}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Rank Level</label>
+                      <input
+                        type="text"
+                        name="rank_level"
+                        placeholder="Enter rank level"
+                        value={formData.rank_level}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Specialization</label>
+                      <input
+                        type="text"
+                        name="specialization"
+                        placeholder="Enter specialization"
+                        value={formData.specialization}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Hire Date</label>
+                      <input
+                        type="date"
+                        name="hire_date"
+                        value={formData.hire_date}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Employment Type</label>
+                      <select
+                        name="employment_type"
+                        value={formData.employment_type}
+                        onChange={handleChange}
+                      >
+                        <option value="">Select Type</option>
+                        <option value="full_time">Full Time</option>
+                        <option value="part_time">Part Time</option>
+                        <option value="contract">Contract</option>
+                        <option value="probationary">Probationary</option>
+                      </select>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Highest Education</label>
+                      <input
+                        type="text"
+                        name="highest_education"
+                        placeholder="Enter highest education"
+                        value={formData.highest_education}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.modalFooter}>
+                  <button
+                    className={styles.cancelBtn}
+                    onClick={() => {
+                      setShowModal(false);
+                      setEditTeacher(null);
+                      setFormData({
+                        school_id: "",
+                        first_name: "",
+                        last_name: "",
+                        department: "",
+                        rank_level: "",
+                        age: "",
+                      });
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className={styles.saveBtn}
+                    onClick={editTeacher ? updateTeacher : addTeacher}
+                  >
+                    {editTeacher ? "Update Teacher" : "Save Teacher"}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    </ThemeProvider>
+          )}
+        </div>
+      </ThemeProvider>
+    </>
   );
 }
 

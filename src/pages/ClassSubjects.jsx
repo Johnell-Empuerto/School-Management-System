@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "../services/api";
 import styles from "../assets/styles/ClassSubjects.module.css";
 import { Helmet } from "react-helmet-async";
 
@@ -135,8 +135,6 @@ function ClassSubjects() {
     teacher_id: "",
   });
 
-  const API = "http://localhost:3001/api";
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -158,7 +156,7 @@ function ClassSubjects() {
 
     // Class filter
     if (filterClass !== "all") {
-      result = result.filter((item) => item.class_id === parseInt(filterClass));
+      result = result.filter((item) => item.class_id === filterClass);
     }
 
     // Subject filter
@@ -189,23 +187,23 @@ function ClassSubjects() {
   };
 
   const fetchAssignments = async () => {
-    const res = await axios.get(`${API}/class-subjects`);
+    const res = await api.get("/class-subjects");
     setClassSubjects(res.data);
     setFilteredClassSubjects(res.data);
   };
 
   const fetchClasses = async () => {
-    const res = await axios.get(`${API}/classes`);
+    const res = await api.get("/classes");
     setClasses(res.data);
   };
 
   const fetchSubjects = async () => {
-    const res = await axios.get(`${API}/subjects`);
+    const res = await api.get("/subjects");
     setSubjects(res.data);
   };
 
   const fetchTeachers = async () => {
-    const res = await axios.get(`${API}/teachers`);
+    const res = await api.get("/teachers");
     setTeachers(res.data);
   };
 
@@ -269,7 +267,7 @@ function ClassSubjects() {
     e.preventDefault();
 
     try {
-      await axios.post(`${API}/class-subjects`, formData);
+      await api.post("/class-subjects", formData);
 
       setFormData({
         class_id: "",
@@ -289,7 +287,7 @@ function ClassSubjects() {
       if (!window.confirm("Are you sure you want to delete this assignment?"))
         return;
 
-      await axios.delete(`${API}/class-subjects/${id}`);
+      await api.delete(`/class-subjects/${id}`);
       fetchData();
     } catch (err) {
       alert(err.response?.data?.message || "Failed to delete assignment");
@@ -298,7 +296,7 @@ function ClassSubjects() {
 
   const updateTeacher = async (id, teacher_id) => {
     try {
-      await axios.put(`${API}/class-subjects/${id}`, {
+      await api.put(`/class-subjects/${id}`, {
         teacher_id,
       });
       fetchData();
@@ -383,7 +381,11 @@ function ClassSubjects() {
                 <FaFilter className={styles.filterIcon} />
                 <select
                   value={filterClass}
-                  onChange={(e) => setFilterClass(e.target.value)}
+                  onChange={(e) =>
+                    setFilterClass(
+                      e.target.value === "all" ? "all" : Number(e.target.value),
+                    )
+                  }
                 >
                   <option value="all">All Classes</option>
                   {classOptions.map((cls) => (
@@ -400,7 +402,11 @@ function ClassSubjects() {
                 <FaFilter className={styles.filterIcon} />
                 <select
                   value={filterSubject}
-                  onChange={(e) => setFilterSubject(e.target.value)}
+                  onChange={(e) =>
+                    setFilterSubject(
+                      e.target.value === "all" ? "all" : Number(e.target.value),
+                    )
+                  }
                 >
                   <option value="all">All Subjects</option>
                   {subjectOptions.map((subj) => (

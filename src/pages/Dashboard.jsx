@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import styles from "../assets/styles/Dashboard.module.css"; // Updated import
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -30,9 +30,7 @@ function Dashboard() {
 
   const fetchDashboard = async () => {
     try {
-      const res = await axios.get("http://localhost:3001/api/dashboard", {
-        withCredentials: true,
-      });
+      const res = await api.get("/dashboard");
       setStats(res.data.data);
     } catch (error) {
       console.error("Error fetching dashboard:", error);
@@ -41,9 +39,7 @@ function Dashboard() {
 
   const fetchActivities = async () => {
     try {
-      const res = await axios.get("http://localhost:3001/api/activities", {
-        withCredentials: true,
-      });
+      const res = await api.get("/activities");
 
       if (Array.isArray(res.data)) {
         setActivities(res.data); // old format
@@ -57,15 +53,13 @@ function Dashboard() {
 
   const fetchAttendanceChart = async () => {
     try {
-      let endpoint = "http://localhost:3001/api/dashboard/attendance-chart";
+      let endpoint = "/dashboard/attendance-chart";
 
       if (user.role === "student") {
-        endpoint = "http://localhost:3001/api/dashboard/student-attendance";
+        endpoint = "/dashboard/student-attendance";
       }
 
-      const res = await axios.get(endpoint, {
-        withCredentials: true,
-      });
+      const res = await api.get(endpoint);
 
       setAttendanceData(res.data);
     } catch (error) {
