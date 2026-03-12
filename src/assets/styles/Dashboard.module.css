@@ -1,0 +1,688 @@
+/* Dashboard.module.css - Beautiful Redesign matching Profile.css */
+
+/* Main container */
+.dashboardContainer {
+  padding: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* HEADER SECTION */
+.dashboardContainer h1 {
+  color: var(--primary-color, #2e7d32);
+  margin-bottom: 10px;
+  font-size: 2.5rem;
+  position: relative;
+  padding-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboardContainer h1::before {
+  content: "📊";
+  font-size: 2rem;
+  margin-right: 10px;
+}
+
+.dashboardContainer h1::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-color, #2e7d32),
+    var(--secondary-color, #4caf50)
+  );
+  border-radius: 2px;
+}
+
+.dashboardContainer h2 {
+  color: #2c3e50;
+  margin: 40px 0 25px;
+  font-size: 2rem;
+  position: relative;
+  padding-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboardContainer h2::before {
+  content: "📋";
+  font-size: 1.8rem;
+}
+
+.dashboardContainer h2::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--secondary-color, #4caf50),
+    var(--primary-color, #2e7d32)
+  );
+  border-radius: 2px;
+}
+
+/* School Year Badge */
+.schoolYearBadge {
+  display: inline-block;
+  margin-top: 8px;
+  margin-bottom: 30px;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, var(--primary-color, #2e7d32), #4caf50);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 30px;
+  box-shadow: 0 5px 15px rgba(0, 100, 0, 0.2);
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.schoolYearBadge::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+/* Dashboard Cards Grid */
+.dashboardCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 100, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 150, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(76, 175, 80, 0.1) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 20px 35px rgba(0, 100, 0, 0.2);
+}
+
+.card:hover::before {
+  opacity: 1;
+  animation: rotate 10s linear infinite;
+}
+
+.card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.card:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.card:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+.card h3 {
+  color: var(--primary-color, #2e7d32);
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.card p {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+  position: relative;
+}
+
+/* Teacher Dashboard */
+.dashboardTeacher {
+  background: white;
+  border-radius: 24px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 15px 35px rgba(0, 100, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(0, 150, 0, 0.1);
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.dashboardTeacher::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-color, #2e7d32),
+    #4caf50,
+    #8bc34a
+  );
+  background-size: 200% 100%;
+  animation: gradientMove 3s infinite;
+}
+
+.dashboardTeacher h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.dashboardTeacher h2::before {
+  content: "👨‍🏫";
+}
+
+.dashboardActions {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.dashboardBtn {
+  background: linear-gradient(135deg, var(--primary-color, #2e7d32), #2e7d32);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(0, 100, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboardBtn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.dashboardBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 100, 0, 0.4);
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+}
+
+.dashboardBtn:hover::before {
+  left: 100%;
+}
+
+.dashboardBtn:active {
+  transform: scale(0.96);
+}
+
+/* Chart Cards */
+.dashboardChartCard {
+  background: white;
+  border-radius: 24px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 15px 35px rgba(0, 100, 0, 0.1);
+  border: 1px solid rgba(0, 150, 0, 0.1);
+  animation: fadeInUp 0.6s ease-out;
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboardChartCard::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(
+    circle,
+    rgba(76, 175, 80, 0.1) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+
+.dashboardChartCard h3 {
+  color: var(--primary-color, #2e7d32);
+  margin-bottom: 25px;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.dashboardChartCard h3::before {
+  content: "📈";
+  font-size: 1.8rem;
+}
+
+/* Activities Section */
+.dashboardActivities {
+  background: white;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 15px 35px rgba(0, 100, 0, 0.1);
+  border: 1px solid rgba(0, 150, 0, 0.1);
+  animation: fadeInUp 0.6s ease-out;
+  animation-delay: 0.3s;
+  animation-fill-mode: both;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboardActivitiesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.dashboardActivitiesHeader h2 {
+  margin: 0;
+}
+
+.dashboardActivitiesHeader h2::before {
+  content: "📢";
+}
+
+.viewMoreBtn {
+  background: linear-gradient(135deg, var(--primary-color, #2e7d32), #2e7d32);
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 30px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(0, 100, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.viewMoreBtn::before {
+  content: "→";
+  margin-right: 8px;
+  font-size: 1.1rem;
+}
+
+.viewMoreBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 100, 0, 0.3);
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+}
+
+.viewMoreBtn:active {
+  transform: scale(0.96);
+}
+
+/* Activity Items */
+.activityItem {
+  border-bottom: 1px solid rgba(0, 150, 0, 0.1);
+  padding: 20px 0;
+  transition: all 0.3s ease;
+  position: relative;
+  animation: slideIn 0.5s ease-out;
+  animation-fill-mode: both;
+}
+
+.activityItem:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.activityItem:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.activityItem:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.activityItem:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.activityItem:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+.activityItem:last-child {
+  border-bottom: none;
+}
+
+.activityItem:hover {
+  background: linear-gradient(90deg, rgba(76, 175, 80, 0.05), transparent);
+  padding-left: 15px;
+  padding-right: 15px;
+  border-radius: 12px;
+}
+
+.activityType {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.activityType::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+.activityType.announcement {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+  color: white;
+}
+
+.activityType.activity {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: white;
+}
+
+.activityTitle {
+  color: var(--primary-color, #2e7d32);
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  display: block;
+  font-weight: 600;
+}
+
+.activityDescription {
+  color: #555;
+  line-height: 1.6;
+  margin: 10px 0;
+  font-size: 0.95rem;
+}
+
+.activityDate {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #666;
+  font-size: 0.85rem;
+  background: #f5f5f5;
+  padding: 5px 15px;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+}
+
+.activityDate:hover {
+  background: var(--primary-color, #2e7d32);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 100, 0, 0.2);
+}
+
+/* ANIMATIONS */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* LOADING STATE */
+.loadingState {
+  text-align: center;
+  padding: 60px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 100, 0, 0.1);
+  color: var(--primary-color, #2e7d32);
+  font-size: 1.2rem;
+  animation: pulse 1.5s infinite;
+  border: 2px solid var(--primary-color, #2e7d32);
+  position: relative;
+  overflow: hidden;
+}
+
+.loadingState::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 150, 0, 0.1),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+/* TOOLTIP */
+[data-tooltip] {
+  position: relative;
+  cursor: help;
+}
+
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  margin-bottom: 5px;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 992px) {
+  .dashboardCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboardContainer {
+    padding: 15px;
+  }
+
+  .dashboardContainer h1 {
+    font-size: 2rem;
+  }
+
+  .dashboardContainer h2 {
+    font-size: 1.5rem;
+  }
+
+  .dashboardCards {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .dashboardActions {
+    flex-direction: column;
+  }
+
+  .dashboardBtn {
+    text-align: center;
+  }
+
+  .dashboardActivitiesHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .viewMoreBtn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .activityItem:hover {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboardContainer {
+    padding: 10px;
+  }
+
+  .schoolYearBadge {
+    width: 100%;
+    text-align: center;
+  }
+
+  .card p {
+    font-size: 2rem;
+  }
+
+  .activityItem {
+    padding: 15px 0;
+  }
+
+  .activityTitle {
+    font-size: 1.1rem;
+  }
+
+  .activityDescription {
+    font-size: 0.9rem;
+  }
+}

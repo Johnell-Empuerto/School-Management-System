@@ -1,0 +1,132 @@
+Title: School Management System
+
+Frontend
+React.js
+
+Backend
+Express.js
+
+Authentication
+JWT + bcrypt
+
+Security
+Helmet
+Rate limit
+Input validation
+
+Database
+MySQL - XAMPP
+
+Deployment
+Docker or VPS
+
+======================================================================================
+
+Frontend Structure:
+
+src
+│
+├── assets
+│   ├── images
+│   │   └── school-logo.png
+│   └── icons
+│   ├── styles
+│   │   └── global.css
+│   │   └── Login.css
+│   │   └── Student.css
+│   │   └── Teacher.css
+│   │   └── Enrollment.css
+│   │   └── Grades.css
+│   │   └── Attendance.css
+│   │   └── Reports.css
+│   │   └── Users.css
+│   │   └── Settings.css
+│   │   └── Profile.css
+│   ├── font
+│   │   └── Roboto
+│   │           └── Roboto-Regular.ttf
+│   │   └── OpenSans
+│   │           └── OpenSans-Regular.ttf
+│
+├── components
+│   ├── Navbar.jsx
+│   ├── Sidebar.jsx
+│   └── ProtectedRoute.jsx
+│   └── PublicRoute.jsx
+│   └── Layout.jsx
+│
+├── pages
+│   ├── Login.jsx
+│   ├── Dashboard.jsx
+│   ├── Students.jsx
+│   ├── Teachers.jsx
+│   ├── Enrollment.jsx
+│   ├── Grades.jsx
+│   ├── Attendance.jsx
+│   └── Reports.jsx
+│   └── Users.jsx
+│   └── Settings.jsx
+│   └── Profile.jsx
+│
+├── routes
+│   └── AppRoutes.jsx
+│
+├── services
+│   └── api.js
+│
+├── App.jsx
+└── main.jsx
+
+
+
+library frontend:
+npm install react-router-dom axios react-icons sweetalert2 dayjs recharts
+
+Theme colors:
+--primary-color: #09680a;
+--secondary-color: #ffff09;
+--tertiary-color: #f3ece5;
+
+Font:
+--primary-font: 'Roboto', sans-serif -> Heading or Title
+--secondary-font: 'Open Sans', sans-serif;
+
+
+================================================================================================
+
+Structure Backend:
+
+school-management-system-backend
+│
+├── controllers
+│   ├── authController.js
+│   ├── studentController.js
+│   └── teacherController.js
+│
+├── models
+│   ├── userModel.js
+│   ├── studentModel.js
+│   └── teacherModel.js
+│
+├── routes
+│   ├── authRoutes.js
+│   ├── studentRoutes.js
+│   └── teacherRoutes.js
+│
+├── middleware
+│   ├── authMiddleware.js
+│   ├── rateLimiter.js
+│   └── validator.js
+│
+├── config
+│   └── db.js
+│
+├── index.js
+├── .env
+└── package.json
+
+library backend:
+npm install express cors dotenv mysql2 bcryptjs helmet express-rate-limit express-session
+
+Hot reload:
+npm install nodemon --save-dev

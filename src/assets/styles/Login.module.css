@@ -1,0 +1,580 @@
+/* Login.module.css - Beautiful Redesign matching other components */
+
+.loginContainer {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Background Decorative Circles */
+.bgCircle1 {
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  animation: float 20s infinite;
+}
+
+.bgCircle2 {
+  position: absolute;
+  bottom: -150px;
+  left: -150px;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  animation: float 25s infinite reverse;
+}
+
+.bgCircle3 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.05) 0%,
+    transparent 70%
+  );
+  animation: pulse 10s infinite;
+}
+
+.loginWrapper {
+  display: flex;
+  width: 1000px;
+  max-width: 90%;
+  min-height: 600px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 40px;
+  box-shadow: 0 50px 100px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+  animation: slideUp 0.6s ease-out;
+}
+
+/* Brand Section (Left Side) */
+.brandSection {
+  flex: 1;
+  background: linear-gradient(135deg, #09680a 0%, #0a7a0b 100%);
+  padding: 50px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.brandSection::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 70%
+  );
+  animation: rotate 30s linear infinite;
+}
+
+.brandContent {
+  position: relative;
+  z-index: 2;
+  color: white;
+  text-align: center;
+}
+
+.schoolIcon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  animation: bounce 2s ease-in-out infinite;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+}
+
+.brandTitle {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #fff, #e0e0e0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brandSubtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+  position: relative;
+  padding-bottom: 20px;
+}
+
+.brandSubtitle::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.featureList {
+  text-align: left;
+  max-width: 250px;
+  margin: 0 auto;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  padding: 8px 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  animation: slideInRight 0.5s ease-out;
+  animation-fill-mode: both;
+}
+
+.featureItem:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.featureItem:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.featureItem:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.featureItem:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.featureItem:hover {
+  transform: translateX(5px);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.featureDot {
+  width: 8px;
+  height: 8px;
+  background: #ffd700;
+  border-radius: 50%;
+  box-shadow: 0 0 15px #ffd700;
+  animation: pulse 1.5s infinite;
+}
+
+/* Form Section (Right Side) */
+.formSection {
+  flex: 1;
+  padding: 50px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+}
+
+.formCard {
+  width: 100%;
+  max-width: 350px;
+}
+
+.formHeader {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.formHeader h2 {
+  color: #09680a;
+  font-size: 2rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.formHeader h2::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #09680a, #4caf50);
+  border-radius: 2px;
+}
+
+.schoolName {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding: 0 20px;
+}
+
+/* Form Styles */
+.loginForm {
+  margin-top: 30px;
+}
+
+.inputGroup {
+  margin-bottom: 25px;
+}
+
+.inputGroup label {
+  display: block;
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  margin-left: 5px;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 15px;
+  color: #999;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.inputWrapper input {
+  width: 100%;
+  padding: 14px 45px 14px 45px;
+  border: 2px solid #e0e0e0;
+  border-radius: 15px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+  color: #333;
+}
+
+.inputWrapper input:focus {
+  outline: none;
+  border-color: #09680a;
+  background: white;
+  box-shadow: 0 5px 20px rgba(9, 104, 10, 0.1);
+}
+
+.inputWrapper input:focus + .inputIcon {
+  color: #09680a;
+}
+
+.inputWrapper input:hover {
+  border-color: #4caf50;
+}
+
+.inputWrapper input:disabled {
+  background: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.passwordToggle:hover {
+  color: #09680a;
+  transform: scale(1.1);
+}
+
+/* Form Options */
+.formOptions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  font-size: 0.9rem;
+}
+
+.rememberMe {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  cursor: pointer;
+}
+
+.rememberMe input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #09680a;
+}
+
+.forgotPassword {
+  color: #09680a;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.forgotPassword::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #09680a;
+  transition: width 0.3s ease;
+}
+
+.forgotPassword:hover {
+  color: #0a7a0b;
+}
+
+.forgotPassword:hover::after {
+  width: 100%;
+}
+
+/* Login Button */
+.loginBtn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #09680a, #0a7a0b);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(9, 104, 10, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.loginBtn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.loginBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(9, 104, 10, 0.4);
+  background: linear-gradient(135deg, #0a7a0b, #09680a);
+}
+
+.loginBtn:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.loginBtn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.loginBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Loader Animation */
+.loader {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Form Footer */
+.formFooter {
+  margin-top: 30px;
+  text-align: center;
+  color: #999;
+  font-size: 0.8rem;
+}
+
+/* Animations */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-30px) rotate(5deg);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .loginWrapper {
+    flex-direction: column;
+    max-width: 95%;
+    min-height: auto;
+  }
+
+  .brandSection {
+    padding: 40px 20px;
+  }
+
+  .brandTitle {
+    font-size: 2.5rem;
+  }
+
+  .featureList {
+    max-width: 100%;
+  }
+
+  .formSection {
+    padding: 40px 20px;
+  }
+
+  .formHeader h2 {
+    font-size: 1.8rem;
+  }
+
+  .bgCircle1,
+  .bgCircle2,
+  .bgCircle3 {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .formOptions {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .loginBtn {
+    padding: 14px;
+    font-size: 1rem;
+  }
+
+  .brandTitle {
+    font-size: 2rem;
+  }
+
+  .schoolIcon {
+    font-size: 3rem;
+  }
+}

@@ -1,0 +1,134 @@
+Frontend:
+
+First Step: Structure - Done
+Second Step: UI login - Done
+Third Step: Every visit the / go to login - Done
+
+
+Backend:
+Create Table for users - Done
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    school_id VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin','teacher','student') NOT NULL,
+    status ENUM('active','inactive') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    suffix_name VARCHAR(100),
+
+    age INT,
+    grade_level VARCHAR(20),
+    section VARCHAR(20),
+
+    status ENUM('active','graduated','dropped','transferred') DEFAULT 'active',
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+
+CREATE TABLE teachers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    department VARCHAR(100),
+    rank_level VARCHAR(100),
+    age INT,
+    
+
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+You already completed:
+
+✔ Express server - done
+✔ MVC structure - done
+✔ MySQL connection - done
+✔ mysql2 queries - done
+✔ bcrypt password hashing - done
+
+1️ Login API - done
+2️ Express Session - done
+3️ Protected routes - done
+4 Public routes - done
+5 Connect React login page - done
+
+
+NEXT:
+
+1️⃣ User Role System
+2️⃣ Dashboard Data
+3️⃣ Student Management
+4️⃣ Teacher Management
+5️⃣ Enrollment System
+6️⃣ Subjects
+7️⃣ Grades
+8️⃣ Attendance
+9️⃣ Reports
+
+1. 1️⃣ User Role System - Done
+
+# Role Access Table
+
+| Page       | Admin | Teacher | Student   |
+| ---------- | ----- | ------- | --------- |
+| Login      | ✅     | ✅       | ✅         |
+| Dashboard  | ✅     | ✅       | ✅         |
+| Students   | ✅     | ✅       | ❌         |
+| Teachers   | ✅     | ❌       | ❌         |
+| Enrollment | ✅     | ❌       | ✅         |
+| Grades     | ✅     | ✅       | View Only |
+| Attendance | ✅     | ✅       | View Only |
+| Reports    | ✅     | ✅       | ❌         |
+| Users      | ✅     | ❌       | ❌         |
+| Settings   | ✅     | ❌       | ❌         |
+| Profile    | ✅     | ✅       | ✅         |
+
+
+# Page Content Description
+
+**Login.jsx** - Done
+User authentication page where students, teachers, and administrators log in using their school ID and password.
+
+**Students.jsx** - 
+Displays and manages student records including student information, enrollment status, and class assignments.
+
+**Teachers.jsx** -
+Admin page for managing teacher accounts, teacher information, and assigned subjects.
+
+**Enrollment.jsx** -
+Allows students to submit enrollment requests and administrators to review and approve them.
+
+**Grades.jsx** - 
+Teachers input and manage student grades, while students can view their academic results.
+
+**Attendance.jsx** - 
+Teachers record student attendance and students can view their attendance history.
+
+**Reports.jsx** - 
+Generates academic reports such as grade summaries, attendance reports, and class performance.
+
+**Users.jsx** - 
+Admin-only page for managing system users including admins, teachers, and student accounts.
+
+**Settings.jsx** -
+System configuration page where administrators manage system settings and preferences.
+
+**Profile.jsx** -
+Personal profile page where users can view and update their personal information and account details.
+
+**Dashboard.jsx** -
+Main overview page displaying system statistics, quick access to modules, and summary information.
+

@@ -1,0 +1,53 @@
+/* Roboto Font */
+@font-face {
+  font-family: "Roboto";
+  src: url("../font/Roboto/Roboto-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Open Sans Font */
+@font-face {
+  font-family: "Open Sans";
+  src: url("../font/OpenSans/OpenSans-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-color: #09680a;
+  --secondary-color: #ffff09;
+  --tertiary-color: #f3ece5;
+
+  --primary-font: "Roboto", sans-serif;
+  --secondary-font: "Open Sans", sans-serif;
+}
+
+body {
+  font-family: var(--secondary-font);
+  background: var(--tertiary-color);
+  margin: 0;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--primary-font);
+}
+
+.main-layout {
+  display: flex;
+  min-height: calc(100vh - 60px);
+}
+
+.page-content {
+  flex: 1;
+  padding: 20px;
+  min-width: 0;
+}

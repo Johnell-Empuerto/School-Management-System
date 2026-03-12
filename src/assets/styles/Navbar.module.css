@@ -1,0 +1,705 @@
+/* Navbar.module.css - Beautiful Redesign matching other components */
+
+.navbar {
+  height: 70px;
+  background: linear-gradient(135deg, #09680a 0%, #0a7a0b 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 25px;
+  box-shadow: 0 4px 20px rgba(0, 100, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+  transition: all 0.3s ease;
+}
+
+.navbarExpanded {
+  margin-left: 0;
+}
+
+/* LEFT SIDE */
+.navbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Toggle Button */
+.toggleBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.toggleBtn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.toggleBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.toggleBtn:hover::before {
+  left: 100%;
+}
+
+.toggleBtn:active {
+  transform: scale(0.95);
+}
+
+/* Logo Wrapper */
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 10px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.logoWrapper:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(2px);
+}
+
+.logoIcon {
+  font-size: 2rem;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+}
+
+.logoTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  background: linear-gradient(135deg, #fff, #e0e0e0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logoSubtitle {
+  font-size: 0.65rem;
+  opacity: 0.8;
+  letter-spacing: 0.3px;
+}
+
+/* CENTER - Search Bar */
+.searchWrapper {
+  flex: 0 1 400px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  animation: slideIn 0.5s ease-out;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 45px 12px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  backdrop-filter: blur(5px);
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.searchBtn {
+  position: absolute;
+  right: 5px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.searchBtn:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(1.1);
+}
+
+/* RIGHT SIDE */
+.navbarRight {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Icon Buttons */
+.iconBtn {
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.iconBtn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.iconBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.iconBtn:hover::before {
+  left: 100%;
+}
+
+.iconBtn:active {
+  transform: scale(0.95);
+}
+
+/* Badge for notifications */
+.badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff4757, #ff6b81);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border: 2px solid #09680a;
+  animation: pulse 1.5s infinite;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.tooltip::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #333;
+}
+
+.iconBtn:hover .tooltip,
+.toggleBtn:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  bottom: -35px;
+}
+
+/* User Menu */
+.userMenu {
+  position: relative;
+}
+
+.userBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 10px 5px 5px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.userBtn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.userBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.userBtn:hover::before {
+  left: 100%;
+}
+
+.userAvatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #ffd700, #ffa500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.userAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  color: #09680a;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.userName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.userRole {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+.arrow {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+  margin-left: 5px;
+}
+
+.arrowUp {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Container */
+.dropdownContainer {
+  position: relative;
+}
+
+/* Dropdown Menu */
+.dropdownMenu {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 320px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: slideDown 0.3s ease-out;
+  z-index: 1000;
+  border: 1px solid rgba(0, 150, 0, 0.1);
+}
+
+.userMenu .dropdownMenu {
+  width: 280px;
+}
+
+.dropdownHeader {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.dropdownHeader h3 {
+  color: #09680a;
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+.dropdownBadge {
+  background: #09680a;
+  color: white;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.dropdownList {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 20px;
+  width: 100%;
+  border: none;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  color: #333;
+  font-size: 0.9rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdownItem::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(9, 104, 10, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.dropdownItem:hover {
+  background: #f8f9fa;
+  padding-left: 25px;
+}
+
+.dropdownItem:hover::before {
+  left: 100%;
+}
+
+.dropdownItem.unread {
+  background: #e8f5e8;
+  position: relative;
+}
+
+.dropdownItem.unread::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #09680a;
+  animation: pulse 1.5s infinite;
+}
+
+.itemIcon {
+  color: #09680a;
+  font-size: 1.1rem;
+}
+
+.itemContent {
+  flex: 1;
+}
+
+.itemContent p {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.itemTime {
+  font-size: 0.7rem;
+  color: #999;
+}
+
+.dropdownFooter {
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+  text-align: center;
+}
+
+.viewAllBtn {
+  background: none;
+  border: none;
+  color: #09680a;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.viewAllBtn:hover {
+  color: #0a7a0b;
+  text-decoration: underline;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: #eee;
+  margin: 5px 0;
+}
+
+/* User Stats in Dropdown */
+.userStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.stat {
+  text-align: center;
+}
+
+.statValue {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #09680a;
+  line-height: 1.2;
+}
+
+.statLabel {
+  font-size: 0.65rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Logout Item */
+.logoutItem {
+  color: #f44336;
+}
+
+.logoutItem .itemIcon {
+  color: #f44336;
+}
+
+.logoutItem:hover {
+  background: #ffebee;
+}
+
+/* ANIMATIONS */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 992px) {
+  .searchWrapper {
+    display: none;
+  }
+
+  .logoSubtitle {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 15px;
+  }
+
+  .userInfo {
+    display: none;
+  }
+
+  .userName {
+    display: none;
+  }
+
+  .userRole {
+    display: none;
+  }
+
+  .userBtn {
+    padding: 5px;
+  }
+
+  .userAvatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .arrow {
+    display: none;
+  }
+
+  .logoTitle {
+    font-size: 1rem;
+  }
+
+  .logoIcon {
+    font-size: 1.5rem;
+  }
+
+  .dropdownMenu {
+    width: 280px;
+    right: -50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .iconBtn {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+
+  .toggleBtn {
+    width: 35px;
+    height: 35px;
+  }
+
+  .badge {
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+  }
+}
