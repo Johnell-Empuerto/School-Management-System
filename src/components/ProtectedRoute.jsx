@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import LoadingScreen from "./LoadingScreen"; // Add this import
 
 function ProtectedRoute({ allowedRoles }) {
   const [loading, setLoading] = useState(true);
@@ -22,7 +23,7 @@ function ProtectedRoute({ allowedRoles }) {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingScreen />; // Changed from <div>Loading...</div>
 
   // not logged in
   if (!authenticated) return <Navigate to="/" />;

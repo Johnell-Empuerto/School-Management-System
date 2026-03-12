@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import LoadingScreen from "./LoadingScreen"; // Add this import
 
 function PublicRoute({ children }) {
   const [loading, setLoading] = useState(true);
@@ -20,7 +21,7 @@ function PublicRoute({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingScreen />; // Changed from <div>Loading...</div>
 
   // if logged in already → go to dashboard
   if (authenticated) return <Navigate to="/dashboard" />;
