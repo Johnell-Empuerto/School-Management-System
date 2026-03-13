@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
-import styles from "../assets/styles/Dashboard.module.css"; // Updated import
+import styles from "../assets/styles/Dashboard.module.css";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import LoadingScreen from "../components/LoadingScreen";
 
 import {
   BarChart,
@@ -18,14 +19,27 @@ function Dashboard() {
   const [stats, setStats] = useState(null);
   const [activities, setActivities] = useState([]);
   const [attendanceData, setAttendanceData] = useState([]);
+  const [loading, setLoading] = useState(true); // Add loading state
   const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    fetchDashboard();
-    fetchActivities();
-    fetchAttendanceChart();
+    const fetchAllData = async () => {
+      try {
+        await Promise.all([
+          fetchDashboard(),
+          fetchActivities(),
+          fetchAttendanceChart(),
+        ]);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setLoading(false); // Set loading to false when all data is fetched
+      }
+    };
+
+    fetchAllData();
   }, []);
 
   const fetchDashboard = async () => {
@@ -60,14 +74,14 @@ function Dashboard() {
       }
 
       const res = await api.get(endpoint);
-
       setAttendanceData(res.data);
     } catch (error) {
       console.error("Error fetching attendance chart:", error);
     }
   };
 
-  if (!stats) return <p>Loading dashboard...</p>;
+  // Show loading screen while data is being fetched
+  if (loading) return <LoadingScreen />;
 
   const studentChartData = attendanceData.map((item) => ({
     status: item.status
@@ -77,12 +91,12 @@ function Dashboard() {
   }));
 
   const overviewChartData = [
-    { name: "Students", total: stats.students || 0 },
-    { name: "Teachers", total: stats.teachers || 0 },
-    { name: "Classes", total: stats.classes || 0 },
-    { name: "Subjects", total: stats.subjects || 0 },
-    { name: "Enrolled", total: stats.enrolled || 0 },
-    { name: "Requests", total: stats.pending_requests || 0 },
+    { name: "Students", total: stats?.students || 0 },
+    { name: "Teachers", total: stats?.teachers || 0 },
+    { name: "Classes", total: stats?.classes || 0 },
+    { name: "Subjects", total: stats?.subjects || 0 },
+    { name: "Enrolled", total: stats?.enrolled || 0 },
+    { name: "Requests", total: stats?.pending_requests || 0 },
   ];
 
   return (
@@ -94,7 +108,7 @@ function Dashboard() {
       <div className={styles.dashboardContainer}>
         <h1>Dashboard</h1>
         <div className={styles.schoolYearBadge}>
-          School Year: {stats.school_year}
+          School Year: {stats?.school_year}
         </div>
 
         {/* ================= ADMIN DASHBOARD ================= */}
@@ -103,32 +117,32 @@ function Dashboard() {
           <div className={styles.dashboardCards}>
             <div className={styles.card}>
               <h3>Total Students</h3>
-              <p>{stats.students}</p>
+              <p>{stats?.students}</p>
             </div>
 
             <div className={styles.card}>
               <h3>Total Teachers</h3>
-              <p>{stats.teachers}</p>
+              <p>{stats?.teachers}</p>
             </div>
 
             <div className={styles.card}>
               <h3>Total Classes</h3>
-              <p>{stats.classes}</p>
+              <p>{stats?.classes}</p>
             </div>
 
             <div className={styles.card}>
               <h3>Total Subjects</h3>
-              <p>{stats.subjects}</p>
+              <p>{stats?.subjects}</p>
             </div>
 
             <div className={styles.card}>
               <h3>Enrolled Students</h3>
-              <p>{stats.enrolled}</p>
+              <p>{stats?.enrolled}</p>
             </div>
 
             <div className={styles.card}>
               <h3>Pending Requests</h3>
-              <p>{stats.pending_requests}</p>
+              <p>{stats?.pending_requests}</p>
             </div>
           </div>
         )}
