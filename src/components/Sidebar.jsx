@@ -27,7 +27,7 @@ function Sidebar({ collapsed, setCollapsed }) {
 
   // 🔹 Close sidebar automatically on mobile when route changes
   useEffect(() => {
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= 768 && typeof setCollapsed === "function") {
       setCollapsed(true);
     }
   }, [location.pathname]);
