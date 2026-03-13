@@ -168,11 +168,6 @@ function Sidebar({ collapsed, setCollapsed }) {
             <Link
               key={item.path}
               to={item.path}
-              onClick={() => {
-                if (window.innerWidth <= 768) {
-                  setCollapsed(true);
-                }
-              }}
               className={`${styles.navItem} ${
                 location.pathname === item.path ? styles.active : ""
               }`}
