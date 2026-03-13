@@ -1,5 +1,4 @@
 import { Link, useLocation } from "react-router-dom";
-import { useEffect } from "react";
 import {
   FaTachometerAlt,
   FaUserGraduate,
@@ -15,6 +14,8 @@ import {
   FaFileAlt,
   FaCalendarAlt,
   FaUsers,
+  FaChevronLeft,
+  FaChevronRight,
 } from "react-icons/fa";
 
 import { MdMoreTime } from "react-icons/md";
@@ -23,14 +24,7 @@ import styles from "../assets/styles/Sidebar.module.css";
 
 function Sidebar({ collapsed, setCollapsed }) {
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem("user") || "null");
-
-  // 🔹 Close sidebar automatically on mobile when route changes
-  useEffect(() => {
-    if (window.innerWidth <= 768 && typeof setCollapsed === "function") {
-      setCollapsed(true);
-    }
-  }, [location.pathname]);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const menu = [
     {
@@ -133,51 +127,67 @@ function Sidebar({ collapsed, setCollapsed }) {
 
   const filteredMenu = menu.filter((item) => item.roles.includes(user?.role));
 
+  const toggleSidebar = () => {
+    setCollapsed(!collapsed);
+  };
+
   return (
-    <div className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`}>
-      <div className={styles.userProfile}>
-        <div className={styles.userAvatar}>
-          {user?.firstName?.charAt(0) || "U"}
+    <>
+      <div className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`}>
+        {/* //i dont use for now */}
+        {/* <div className={styles.sidebarHeader}>
+          <div className={styles.logoWrapper}>
+            <div className={styles.logoIcon}>🏫</div>
+            {!collapsed && (
+              <div className={styles.logoText}>
+                <span className={styles.logoTitle}>SMS</span>
+                <span className={styles.logoSubtitle}>School Manager</span>
+              </div>
+            )}
+          </div>
+        </div> */}
+
+        <div className={styles.userProfile}>
+          <div className={styles.userAvatar}>
+            {user?.firstName?.charAt(0) || "U"}
+          </div>
+          {!collapsed && (
+            <div className={styles.userInfo}>
+              <div className={styles.userName}>
+                {user?.firstName} {user?.lastName}
+              </div>
+              <div className={styles.userRole}>
+                {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)}
+              </div>
+            </div>
+          )}
         </div>
 
-        {!collapsed && (
-          <div className={styles.userInfo}>
-            <div className={styles.userName}>
-              {user?.firstName} {user?.lastName}
-            </div>
-            <div className={styles.userRole}>
-              {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)}
-            </div>
-          </div>
-        )}
+        <nav className={styles.navMenu}>
+          {filteredMenu.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`${styles.navItem} ${
+                location.pathname === item.path ? styles.active : ""
+              }`}
+            >
+              <span className={styles.icon}>{item.icon}</span>
+              {!collapsed && <span className={styles.text}>{item.name}</span>}
+              {!collapsed && location.pathname === item.path && (
+                <span className={styles.activeIndicator}></span>
+              )}
+            </Link>
+          ))}
+        </nav>
+
+        <div className={styles.sidebarFooter}>
+          {!collapsed && (
+            <div className={styles.versionInfo}>v1.0.0 • School Management</div>
+          )}
+        </div>
       </div>
-
-      <nav className={styles.navMenu}>
-        {filteredMenu.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={`${styles.navItem} ${
-              location.pathname === item.path ? styles.active : ""
-            }`}
-          >
-            <span className={styles.icon}>{item.icon}</span>
-
-            {!collapsed && <span className={styles.text}>{item.name}</span>}
-
-            {!collapsed && location.pathname === item.path && (
-              <span className={styles.activeIndicator}></span>
-            )}
-          </Link>
-        ))}
-      </nav>
-
-      <div className={styles.sidebarFooter}>
-        {!collapsed && (
-          <div className={styles.versionInfo}>v1.0.0 • School Management</div>
-        )}
-      </div>
-    </div>
+    </>
   );
 }
 
