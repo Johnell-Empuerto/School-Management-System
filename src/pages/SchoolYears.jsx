@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import api from "../services/api";
 import styles from "../assets/styles/SchoolYears.module.css";
 import { Helmet } from "react-helmet-async";
+import Swal from "sweetalert2";
 import {
   FaSearch,
   FaFilter,
@@ -255,7 +256,14 @@ function SchoolYears() {
 
       fetchYears();
     } catch (error) {
-      alert(error.response?.data?.message || "Something went wrong");
+      let errorValue = error.response?.data?.message || "Something went wrong";
+
+      Swal.fire({
+        title: "Error!",
+        text: errorValue,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -271,14 +279,43 @@ function SchoolYears() {
   };
 
   const deleteYear = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this school year?"))
-      return;
+    const result = await Swal.fire({
+      title: "Delete School Year?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
-      await api.delete(`/school-years/${id}`);
+      const res = await api.delete(`/school-years/${id}`);
+
       fetchYears();
+
+      Swal.fire({
+        title: "Success",
+        text: res.data?.message || "School year deleted successfully",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (error) {
-      alert(error.response?.data?.message || "Failed to delete school year");
+      const errValue =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to delete school year";
+
+      Swal.fire({
+        title: "Error!",
+        text: errValue,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -287,7 +324,12 @@ function SchoolYears() {
       await api.put(`/school-years/${id}/activate`);
       fetchYears();
     } catch (error) {
-      alert(error.response?.data?.message || "Failed to activate school year");
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to activate school year",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 

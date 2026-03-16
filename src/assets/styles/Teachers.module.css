@@ -65,6 +65,21 @@
   flex-wrap: wrap;
 }
 
+.deleteBtn {
+  background: #ffebee;
+  border: none;
+  color: #f44336;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteBtn:hover {
+  background: #f44336;
+  color: white;
+}
+
 /* Header Buttons */
 .addBtn {
   padding: 12px 24px;

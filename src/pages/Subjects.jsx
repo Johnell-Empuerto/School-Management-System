@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import api from "../services/api";
 import styles from "../assets/styles/Subjects.module.css";
 import { Helmet } from "react-helmet-async";
+import Swal from "sweetalert2";
 import {
   FaSearch,
   FaTimes,
@@ -197,21 +198,51 @@ function Subjects() {
       fetchSubjects();
     } catch (error) {
       const message = error.response?.data?.message || "Something went wrong";
-      alert(message);
+      Swal.fire({
+        title: "Error!",
+        text: message,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
   const deleteSubject = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this subject?"))
-      return;
+    const result = await Swal.fire({
+      title: "Delete Subject?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       await api.delete(`/subjects/${id}`);
+
       fetchSubjects();
+
+      Swal.fire({
+        title: "Deleted!",
+        text: "Subject has been deleted.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (error) {
       const message =
         error.response?.data?.message || "Failed to delete subject";
-      alert(message);
+
+      Swal.fire({
+        title: "Error!",
+        text: message,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 

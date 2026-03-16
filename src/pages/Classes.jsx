@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import api from "../services/api";
 import styles from "../assets/styles/Classes.module.css";
 import { Helmet } from "react-helmet-async";
-
+import Swal from "sweetalert2";
 import {
   FaSearch,
   FaFilter,
@@ -233,20 +233,51 @@ function Classes() {
       fetchClasses();
     } catch (error) {
       const message = error.response?.data?.message || "Something went wrong";
-      alert(message);
+      Swal.fire({
+        title: "Error!",
+        text: message,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
   const deleteClass = async (id) => {
-    try {
-      if (!window.confirm("Are you sure you want to delete this class?"))
-        return;
+    const result = await Swal.fire({
+      title: "Delete Class?",
+      text: "This class will be permanently deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
 
-      await api.delete(`/classes/${id}`);
+    if (!result.isConfirmed) return;
+
+    try {
+      const res = await api.delete(`/classes/${id}`);
+
       fetchClasses();
+
+      Swal.fire({
+        title: "Success",
+        text: res.data?.message || "Class deleted successfully",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
-      const message = err.response?.data?.message || "Failed to delete class";
-      alert(message);
+      const message =
+        err.response?.data?.message || err.message || "Failed to delete class";
+
+      Swal.fire({
+        title: "Error!",
+        text: message,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 

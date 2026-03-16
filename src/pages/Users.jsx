@@ -2,6 +2,8 @@ import { useEffect, useState, useMemo } from "react";
 import api from "../services/api";
 import styles from "../assets/styles/Users.module.css";
 import { Helmet } from "react-helmet-async";
+import Swal from "sweetalert2";
+
 import {
   FaSearch,
   FaFilter,
@@ -237,7 +239,12 @@ function Users() {
   // create user
   const handleCreateUser = async () => {
     if (!schoolId || !password) {
-      alert("School ID and password required");
+      Swal.fire({
+        title: "Error!",
+        text: "School ID and password required",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
       return;
     }
 
@@ -248,7 +255,12 @@ function Users() {
         role,
       });
 
-      alert("User created successfully");
+      Swal.fire({
+        title: "Success",
+        text: "User created successfully",
+        icon: "success",
+        confirmButtonText: "OK",
+      });
 
       setSchoolId("");
       setPassword("");
@@ -258,24 +270,44 @@ function Users() {
       fetchUsers();
     } catch (error) {
       if (error.response?.data?.message) {
-        alert(error.response.data.message);
+        const errorvalue = error.response.data.message;
+
+        Swal.fire({
+          title: "Error!",
+          text: errorvalue,
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       } else {
-        alert("Error creating user");
+        Swal.fire({
+          title: "Error!",
+          text: "Error creating user",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       }
     }
   };
 
   // activate / deactivate
   const toggleStatus = async (user) => {
+    const result = await Swal.fire({
+      title: "Change User Status?",
+      text: `Set ${user.school_id} to ${
+        user.status === "active" ? "inactive" : "active"
+      }`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+    });
+
+    if (!result.isConfirmed) return;
+
     const newStatus = user.status === "active" ? "inactive" : "active";
 
-    try {
-      await api.put(`/users/${user.id}/status`, { status: newStatus });
+    await api.put(`/users/${user.id}/status`, { status: newStatus });
 
-      fetchUsers();
-    } catch (error) {
-      console.error(error);
-    }
+    fetchUsers();
   };
 
   const startEdit = (user) => {
@@ -292,7 +324,12 @@ function Users() {
         role: editRole,
       });
 
-      alert("User updated");
+      Swal.fire({
+        title: "Success",
+        text: "User updated",
+        icon: "success",
+        confirmButtonText: "OK",
+      });
 
       setEditId(null);
       setShowEditModal(false);

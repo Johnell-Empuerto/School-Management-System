@@ -336,13 +336,36 @@
   animation: slideUp 0.5s ease-out 0.2s both;
 }
 
-/* Table Header */
+/* Single scroll container for both header and body */
+.tableScrollContainer {
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: thin;
+  scrollbar-color: #4caf50 #f0f0f0;
+  max-width: 100%;
+}
+
+.tableScrollContainer::-webkit-scrollbar {
+  height: 8px;
+}
+
+.tableScrollContainer::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+.tableScrollContainer::-webkit-scrollbar-thumb {
+  background: #4caf50;
+  border-radius: 10px;
+}
+
+/* Table Header - now inside the scroll container */
 .tableHeader {
   display: flex;
   background: linear-gradient(135deg, #2e7d32, #1b5e20);
   color: white;
   font-weight: 600;
   border-bottom: 2px solid #1b5e20;
+  min-width: min-content; /* Ensures header expands with content */
 }
 
 .studentColumn {
@@ -353,31 +376,17 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-right: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 .daysHeader {
-  flex: 1;
   display: flex;
-  overflow-x: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #4caf50 #f0f0f0;
-}
-
-.daysHeader::-webkit-scrollbar {
-  height: 6px;
-}
-
-.daysHeader::-webkit-scrollbar-track {
-  background: #f0f0f0;
-}
-
-.daysHeader::-webkit-scrollbar-thumb {
-  background: #4caf50;
-  border-radius: 10px;
+  flex: 1;
 }
 
 .dayCell {
   min-width: 60px;
+  width: 60px; /* Fixed width for better alignment */
   padding: 10px;
   text-align: center;
   font-size: 1.1rem;
@@ -387,6 +396,7 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 .dayWeek {
@@ -395,25 +405,9 @@
   opacity: 0.8;
 }
 
-/* Table Body */
+/* Table Body - now inside the scroll container */
 .tableBody {
-  max-height: 500px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #4caf50 #f0f0f0;
-}
-
-.tableBody::-webkit-scrollbar {
-  width: 8px;
-}
-
-.tableBody::-webkit-scrollbar-track {
-  background: #f0f0f0;
-}
-
-.tableBody::-webkit-scrollbar-thumb {
-  background: #4caf50;
-  border-radius: 10px;
+  min-width: min-content; /* Ensures body expands with content */
 }
 
 .tableRow {
@@ -426,7 +420,7 @@
   background-color: #f8f9fa;
 }
 
-/* Student Info */
+/* Student Info - sticky left column */
 .studentInfo {
   width: 250px;
   min-width: 250px;
@@ -438,7 +432,24 @@
   background: white;
   position: sticky;
   left: 0;
-  z-index: 1;
+  z-index: 2;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+/* Add shadow effect to sticky column for better UX */
+.tableRow:hover .studentInfo {
+  background-color: #f8f9fa;
+}
+
+.studentInfo::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -5px;
+  height: 100%;
+  width: 5px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.1), transparent);
+  pointer-events: none;
 }
 
 .studentAvatar {
@@ -451,23 +462,27 @@
   justify-content: center;
   color: white;
   font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .studentName {
   font-weight: 600;
   color: #2c3e50;
   font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Attendance Row */
+/* Attendance Row - now part of the scrollable content */
 .attendanceRow {
-  flex: 1;
   display: flex;
-  overflow-x: auto;
+  flex: 1;
 }
 
 .attendanceCell {
   min-width: 60px;
+  width: 60px; /* Match dayCell width */
   height: 60px;
   display: flex;
   align-items: center;
@@ -477,12 +492,14 @@
   font-size: 1.2rem;
   font-weight: 600;
   transition: all 0.2s ease;
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 .attendanceCell:hover {
   transform: scale(1.05);
   box-shadow: 0 0 0 2px var(--primary-color, #2e7d32);
-  z-index: 2;
+  z-index: 3;
+  position: relative;
 }
 
 .attendanceCell.present {
@@ -656,6 +673,9 @@
   .dayCell,
   .attendanceCell {
     min-width: 50px;
+    width: 50px;
+    height: 50px;
+    font-size: 1rem;
   }
 
   .legend {
@@ -678,6 +698,8 @@
   .dayCell,
   .attendanceCell {
     min-width: 45px;
+    width: 45px;
+    height: 45px;
     font-size: 0.9rem;
   }
 }

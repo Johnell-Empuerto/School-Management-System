@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import api from "../services/api";
 import styles from "../assets/styles/EnrollmentRequests.module.css";
 import { Helmet } from "react-helmet-async";
-
+import Swal from "sweetalert2";
 import {
   FaSearch,
   FaFilter,
@@ -208,34 +208,84 @@ function EnrollmentRequests() {
   };
 
   const approveRequest = async (id) => {
-    try {
-      if (
-        !window.confirm(
-          "Are you sure you want to approve this enrollment request?",
-        )
-      )
-        return;
+    const result = await Swal.fire({
+      title: "Approve Enrollment Request?",
+      text: "This student will be officially enrolled.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#2e7d32",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, approve it",
+      cancelButtonText: "Cancel",
+    });
 
-      await api.put(`/enrollment-requests/approve/${id}`);
+    if (!result.isConfirmed) return;
+
+    try {
+      const res = await api.put(`/enrollment-requests/approve/${id}`);
+
       fetchRequests();
+
+      Swal.fire({
+        title: "Success",
+        text: res.data?.message || "Enrollment request approved",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to approve request");
+      const errValue =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to approve request";
+
+      Swal.fire({
+        title: "Error!",
+        text: errValue,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
   const rejectRequest = async (id) => {
-    try {
-      if (
-        !window.confirm(
-          "Are you sure you want to reject this enrollment request?",
-        )
-      )
-        return;
+    const result = await Swal.fire({
+      title: "Reject Enrollment Request?",
+      text: "This student request will be rejected.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, reject it",
+      cancelButtonText: "Cancel",
+    });
 
-      await api.put(`/enrollment-requests/reject/${id}`);
+    if (!result.isConfirmed) return;
+
+    try {
+      const res = await api.put(`/enrollment-requests/reject/${id}`);
+
       fetchRequests();
+
+      Swal.fire({
+        title: "Success",
+        text: res.data?.message || "Enrollment request rejected",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to reject request");
+      const errValue =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to reject request";
+
+      Swal.fire({
+        title: "Error!",
+        text: errValue,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 

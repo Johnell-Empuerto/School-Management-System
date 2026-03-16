@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import api from "../services/api";
 import styles from "../assets/styles/ClassSubjects.module.css";
 import { Helmet } from "react-helmet-async";
-
+import Swal from "sweetalert2";
 import {
   FaSearch,
   FaFilter,
@@ -278,19 +278,50 @@ function ClassSubjects() {
       setShowModal(false);
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.message || "Something went wrong");
+      const errValue = err.response?.data?.message || "Something went wrong";
+
+      Swal.fire({
+        title: "Error!",
+        text: errValue,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
   const handleDelete = async (id) => {
-    try {
-      if (!window.confirm("Are you sure you want to delete this assignment?"))
-        return;
+    const result = await Swal.fire({
+      title: "Delete Assignment?",
+      text: "This class subject assignment will be permanently deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
 
-      await api.delete(`/class-subjects/${id}`);
+    if (!result.isConfirmed) return;
+
+    try {
+      const res = await api.delete(`/class-subjects/${id}`);
+
       fetchData();
+
+      Swal.fire({
+        title: "Success",
+        text: res.data?.message || "Assignment deleted successfully",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to delete assignment");
+      Swal.fire({
+        title: "Error!",
+        text: err.response?.data?.message || "Failed to delete assignment",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -301,7 +332,14 @@ function ClassSubjects() {
       });
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to update teacher");
+      const errValue =
+        err.response?.data?.message || "Failed to update teacher";
+      Swal.fire({
+        title: "Error!",
+        text: errValue,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 

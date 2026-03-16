@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import styles from "../assets/styles/Students.module.css";
+import Swal from "sweetalert2";
 
 import { Helmet } from "react-helmet-async";
 
@@ -259,10 +260,22 @@ const Students = () => {
     try {
       if (editId) {
         await api.put(`/students/${editId}`, form);
-        alert("Student updated successfully");
+
+        Swal.fire({
+          title: "Success",
+          text: "Student updated successfully",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
       } else {
         await api.post("/students", form);
-        alert("Student created successfully");
+
+        Swal.fire({
+          title: "Success",
+          text: "Student created successfully",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
       }
 
       resetForm();
@@ -271,9 +284,21 @@ const Students = () => {
     } catch (error) {
       console.error(error);
       if (error.response) {
-        alert(error.response.data.error || "Something went wrong");
+        let errorvalue = error.response.data.error || "Something went wrong";
+
+        Swal.fire({
+          title: "Error!",
+          text: errorvalue,
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       } else {
-        alert("Server error");
+        Swal.fire({
+          title: "Error!",
+          text: "Sever error",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       }
     }
   };
@@ -328,15 +353,44 @@ const Students = () => {
 
   // DELETE
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this student?"))
-      return;
+    const result = await Swal.fire({
+      title: "Delete Student?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
-      await api.delete(`/students/${id}`);
+      const res = await api.delete(`/students/${id}`);
+
       fetchStudents();
-      alert("Student deleted successfully");
+
+      Swal.fire({
+        title: "Success",
+        text: res.data?.message || "Student deleted successfully",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (error) {
-      console.error(error);
+      let errorValue = "Server error";
+
+      if (error.response) {
+        errorValue = error.response.data?.message || "Something went wrong";
+      }
+
+      Swal.fire({
+        title: "Error!",
+        text: errorValue,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 

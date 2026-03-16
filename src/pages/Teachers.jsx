@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import api from "../services/api";
 import styles from "../assets/styles/Teachers.module.css";
 import { Helmet } from "react-helmet-async";
+import Swal from "sweetalert2";
 import {
   FaSearch,
   FaFilter,
@@ -9,6 +10,7 @@ import {
   FaSync,
   FaUserPlus,
   FaEdit,
+  FaTrash,
 } from "react-icons/fa";
 
 // MUI Imports - only for table
@@ -203,6 +205,47 @@ function Teachers() {
     }
   };
 
+  //delete button
+  const deleteTeacher = async (id) => {
+    const result = await Swal.fire({
+      title: "Delete Teacher?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await api.delete(`/teachers/${id}`);
+
+      // remove locally instead of refetch
+      setTeachers((prev) => prev.filter((t) => t.id !== id));
+
+      Swal.fire({
+        title: "Deleted!",
+        text: "Teacher has been deleted.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Unable to delete teacher";
+
+      Swal.fire({
+        title: "Error!",
+        text: message,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  };
+
   // Sorting function
   const handleRequestSort = (property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -280,7 +323,12 @@ function Teachers() {
       fetchTeachers();
     } catch (error) {
       const message = error.response?.data?.message || "Something went wrong";
-      alert(message);
+      Swal.fire({
+        title: "Error!",
+        text: message,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -629,6 +677,15 @@ function Teachers() {
                                   onClick={() => openEditModal(teacher)}
                                 >
                                   <FaEdit />
+                                </button>
+                              </Tooltip>
+
+                              <Tooltip title="Delete Teacher">
+                                <button
+                                  className={styles.deleteBtn}
+                                  onClick={() => deleteTeacher(teacher.id)}
+                                >
+                                  <FaTrash />
                                 </button>
                               </Tooltip>
                             </div>

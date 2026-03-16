@@ -59,23 +59,6 @@ const Navbar = ({ toggleSidebar, collapsed }) => {
     document.body.classList.toggle("dark-mode");
   };
 
-  // Mock notifications
-  const notifications = [
-    { id: 1, text: "New enrollment request", time: "5 min ago", unread: true },
-    {
-      id: 2,
-      text: "Grade submission deadline",
-      time: "1 hour ago",
-      unread: true,
-    },
-    {
-      id: 3,
-      text: "Parent meeting scheduled",
-      time: "2 hours ago",
-      unread: false,
-    },
-  ];
-
   // Mock messages
   const messages = [
     { id: 1, text: "You have 3 unread messages", time: "Just now" },
@@ -127,8 +110,8 @@ const Navbar = ({ toggleSidebar, collapsed }) => {
             onClick={() => setShowDropdown(!showDropdown)}
           >
             <div className={styles.userAvatar}>
-              {user?.profilePicture ? (
-                <img src={user.profilePicture} alt={user?.firstName} />
+              {user?.profile_photo ? (
+                <img src={user.profile_photo} alt={user?.firstName} />
               ) : (
                 <span className={styles.avatarPlaceholder}>
                   {getInitials()}

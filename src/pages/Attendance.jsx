@@ -105,7 +105,21 @@ function Attendance() {
       status: next || null,
     });
 
-    fetchAttendance();
+    // update local state instead of refetch
+    setAttendance((prev) =>
+      prev.map((s) => {
+        if (s.enrollment_id === student.enrollment_id) {
+          return {
+            ...s,
+            attendance: {
+              ...s.attendance,
+              [day]: next,
+            },
+          };
+        }
+        return s;
+      }),
+    );
   };
 
   const filteredClassSubjects = classSubjects.filter((cs) =>
@@ -407,6 +421,7 @@ function Attendance() {
         )}
 
         {/* Table Card */}
+        {/* Table Card */}
         <div className={styles.tableCard}>
           {loading ? (
             <div className={styles.loadingState}>
@@ -415,77 +430,80 @@ function Attendance() {
             </div>
           ) : (
             <>
-              {/* Table Header with Day Numbers */}
-              <div className={styles.tableHeader}>
-                <div className={styles.studentColumn}>Student</div>
-                <div className={styles.daysHeader}>
-                  {days.map((d) => (
-                    <div key={d} className={styles.dayCell}>
-                      {d}
-                      <span className={styles.dayWeek}>
-                        {new Date(year, month - 1, d).toLocaleDateString(
-                          "en-US",
-                          { weekday: "short" },
-                        )}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Table Body */}
-              <div className={styles.tableBody}>
-                {filteredAttendance.length > 0 ? (
-                  filteredAttendance.map((student) => (
-                    <div
-                      key={student.enrollment_id}
-                      className={styles.tableRow}
-                    >
-                      <div className={styles.studentInfo}>
-                        <div className={styles.studentAvatar}>
-                          <FaUserGraduate />
-                        </div>
-                        <div className={styles.studentName}>
-                          {student.first_name} {student.last_name}
-                        </div>
+              {/* Single scroll container for both header and body */}
+              <div className={styles.tableScrollContainer}>
+                {/* Table Header with Day Numbers */}
+                <div className={styles.tableHeader}>
+                  <div className={styles.studentColumn}>Student</div>
+                  <div className={styles.daysHeader}>
+                    {days.map((d) => (
+                      <div key={d} className={styles.dayCell}>
+                        {d}
+                        <span className={styles.dayWeek}>
+                          {new Date(year, month - 1, d).toLocaleDateString(
+                            "en-US",
+                            { weekday: "short" },
+                          )}
+                        </span>
                       </div>
-                      <div className={styles.attendanceRow}>
-                        {days.map((day) => {
-                          const status = student.attendance[day] || "";
-                          const statusInfo = getStatusInfo(status);
-
-                          return (
-                            <div
-                              key={day}
-                              onClick={() => toggleStatus(student, day)}
-                              className={`${styles.attendanceCell} ${status ? styles[status] : ""}`}
-                              style={{
-                                backgroundColor: status
-                                  ? statusInfo.bgColor
-                                  : "transparent",
-                              }}
-                            >
-                              {status === "present" && "✓"}
-                              {status === "absent" && "✗"}
-                              {status === "late" && "L"}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className={styles.emptyState}>
-                    <div className={styles.emptyStateContent}>
-                      <h3>No attendance records found</h3>
-                      <p>
-                        {classSubjectId
-                          ? "Select a different class subject or month"
-                          : "Select a class subject to view attendance"}
-                      </p>
-                    </div>
+                    ))}
                   </div>
-                )}
+                </div>
+
+                {/* Table Body */}
+                <div className={styles.tableBody}>
+                  {filteredAttendance.length > 0 ? (
+                    filteredAttendance.map((student) => (
+                      <div
+                        key={student.enrollment_id}
+                        className={styles.tableRow}
+                      >
+                        <div className={styles.studentInfo}>
+                          <div className={styles.studentAvatar}>
+                            <FaUserGraduate />
+                          </div>
+                          <div className={styles.studentName}>
+                            {student.first_name} {student.last_name}
+                          </div>
+                        </div>
+                        <div className={styles.attendanceRow}>
+                          {days.map((day) => {
+                            const status = student.attendance[day] || "";
+                            const statusInfo = getStatusInfo(status);
+
+                            return (
+                              <div
+                                key={day}
+                                onClick={() => toggleStatus(student, day)}
+                                className={`${styles.attendanceCell} ${status ? styles[status] : ""}`}
+                                style={{
+                                  backgroundColor: status
+                                    ? statusInfo.bgColor
+                                    : "transparent",
+                                }}
+                              >
+                                {status === "present" && "✓"}
+                                {status === "absent" && "✗"}
+                                {status === "late" && "L"}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className={styles.emptyState}>
+                      <div className={styles.emptyStateContent}>
+                        <h3>No attendance records found</h3>
+                        <p>
+                          {classSubjectId
+                            ? "Select a different class subject or month"
+                            : "Select a class subject to view attendance"}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Legend */}

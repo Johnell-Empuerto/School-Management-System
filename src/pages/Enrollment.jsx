@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import api from "../services/api";
 import styles from "../assets/styles/Enrollment.module.css";
 import { Helmet } from "react-helmet-async";
-
+import Swal from "sweetalert2";
 import {
   FaSearch,
   FaFilter,
@@ -318,13 +318,27 @@ function Enrollment() {
   };
 
   const handleDrop = async (id) => {
+    const result = await Swal.fire({
+      title: "Drop Student?",
+      text: "This student will be marked as dropped.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, drop student",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
-      if (!window.confirm("Are you sure you want to drop this student?"))
-        return;
+      const res = await api.put(`/enrollments/drop/${id}`);
 
-      await api.put(`/enrollments/drop/${id}`);
+      showSnackbar(
+        res.data?.message || "Student dropped successfully",
+        "success",
+      );
 
-      showSnackbar("Student dropped successfully", "success");
       fetchData();
     } catch (err) {
       showSnackbar(
@@ -335,13 +349,27 @@ function Enrollment() {
   };
 
   const handleRestore = async (id) => {
+    const result = await Swal.fire({
+      title: "Restore Student?",
+      text: "This student will be restored to active enrollment.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#2e7d32",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, restore student",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
-      if (!window.confirm("Are you sure you want to restore this student?"))
-        return;
+      const res = await api.put(`/enrollments/restore/${id}`);
 
-      await api.put(`/enrollments/restore/${id}`);
+      showSnackbar(
+        res.data?.message || "Student restored successfully",
+        "success",
+      );
 
-      showSnackbar("Student restored successfully", "success");
       fetchData();
     } catch (err) {
       showSnackbar(

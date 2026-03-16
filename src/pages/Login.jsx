@@ -4,6 +4,7 @@ import styles from "../assets/styles/Login.module.css";
 import { FaUser, FaLock, FaSignInAlt, FaSchool } from "react-icons/fa";
 import api from "../services/api";
 import { Helmet } from "react-helmet-async";
+import Swal from "sweetalert2";
 
 function Login() {
   const navigate = useNavigate();
@@ -33,14 +34,26 @@ function Login() {
           navigate("/dashboard");
         }, 500);
       } else {
-        alert(response.data.message || "Login failed");
+        const errValue = response.data.message || "Login failed";
+        Swal.fire({
+          title: "Error!",
+          text: errValue,
+          icon: "error",
+          confirmButtonText: "OK",
+        });
         setLoading(false);
       }
     } catch (err) {
       console.log(err);
-      alert(
-        err.response?.data?.message || "Connection error. Please try again.",
-      );
+      const errvalue =
+        err.response?.data?.message || "Connection error. Please try again.";
+
+      Swal.fire({
+        title: "Error!",
+        text: errvalue,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
       setLoading(false);
     }
   };
