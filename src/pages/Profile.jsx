@@ -152,7 +152,16 @@ function Profile() {
 
   const updateProfile = async () => {
     try {
-      await api.put("/profile", formData);
+      const dataToSend = {
+        ...formData,
+        birthdate: formData.birthdate
+          ? formData.birthdate.split("T")[0] // 🔥 FIX
+          : null,
+      };
+
+      console.log("🚀 SENDING:", dataToSend);
+
+      await api.put("/profile", dataToSend);
 
       setShowEditModal(false);
       fetchProfile();
