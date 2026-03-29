@@ -214,7 +214,10 @@ function Reports() {
 
   const fetchStudentsByClass = async () => {
     try {
-      const res = await api.get(`/students/class/${classId}`);
+      const res = await api.get(
+        `/reports/students-by-class-year?class_id=${classId}&school_year_id=${schoolYearId}`,
+      );
+
       setStudents(res.data);
     } catch (error) {
       console.error("Error fetching students:", error);

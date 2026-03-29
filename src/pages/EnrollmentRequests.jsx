@@ -13,6 +13,7 @@ import {
   FaUserGraduate,
   FaClock,
   FaCheckDouble,
+  FaCalendarAlt,
 } from "react-icons/fa";
 
 // MUI Imports
@@ -145,6 +146,10 @@ function EnrollmentRequests() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
 
+  // School Year states
+  const [schoolYears, setSchoolYears] = useState([]);
+  const [schoolYearId, setSchoolYearId] = useState("");
+
   // Search and Filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [filterGrade, setFilterGrade] = useState("all");
@@ -155,9 +160,41 @@ function EnrollmentRequests() {
   const [orderBy, setOrderBy] = useState("created_at");
   const [order, setOrder] = useState("desc");
 
+  // Load school years on page start
+  const fetchSchoolYears = async () => {
+    try {
+      // get all years for dropdown
+      const yearsRes = await api.get("/school-years");
+      setSchoolYears(yearsRes.data);
+
+      // get active year
+      const activeRes = await api.get("/school-years-active");
+
+      const active = activeRes.data;
+
+      console.log("Active school year:", active);
+
+      if (active) {
+        setSchoolYearId(active.id);
+        fetchRequests(active.id);
+      }
+    } catch (error) {
+      console.error("Error fetching school years:", error);
+    }
+  };
+
   useEffect(() => {
-    fetchRequests();
+    fetchSchoolYears();
   }, []);
+
+  // Reload requests when year changes
+  useEffect(() => {
+    console.log("schoolYearId changed:", schoolYearId);
+
+    if (schoolYearId) {
+      fetchRequests(schoolYearId);
+    }
+  }, [schoolYearId]);
 
   // Search and Filter effect
   useEffect(() => {
@@ -194,10 +231,25 @@ function EnrollmentRequests() {
     setPage(0);
   }, [searchTerm, filterGrade, activeTab, requests]);
 
-  const fetchRequests = async () => {
+  const fetchRequests = async (yearId = schoolYearId) => {
+    console.log("fetchRequests called with yearId:", yearId);
+
+    if (!yearId) {
+      console.warn("fetchRequests stopped because yearId is empty");
+      return;
+    }
+
     setLoading(true);
+
     try {
-      const res = await api.get("/enrollment-requests");
+      const res = await api.get("/enrollment-requests", {
+        params: {
+          school_year_id: yearId,
+        },
+      });
+
+      console.log("Enrollment requests response:", res.data);
+
       setRequests(res.data);
       setFilteredRequests(res.data.filter((r) => r.status === "pending"));
     } catch (error) {
@@ -391,6 +443,9 @@ function EnrollmentRequests() {
     }
   };
 
+  // Get selected school year display
+  const selectedSchoolYear = schoolYears.find((sy) => sy.id === schoolYearId);
+
   return (
     <>
       <Helmet>
@@ -412,6 +467,17 @@ function EnrollmentRequests() {
               </button>
             </div>
           </div>
+
+          {/* School Year Info */}
+          {selectedSchoolYear && (
+            <div className={styles.schoolYearInfo}>
+              <FaCalendarAlt className={styles.schoolYearIcon} />
+              <span>
+                School Year: {selectedSchoolYear.year}{" "}
+                {selectedSchoolYear.is_active ? "(Active)" : ""}
+              </span>
+            </div>
+          )}
 
           {/* Stats Cards */}
           <div className={styles.statsGrid}>
@@ -489,6 +555,21 @@ function EnrollmentRequests() {
                   <FaTimes />
                 </button>
               )}
+            </div>
+
+            {/* School Year Dropdown */}
+            <div className={styles.filterBox}>
+              <FaCalendarAlt className={styles.filterIcon} />
+              <select
+                value={schoolYearId}
+                onChange={(e) => setSchoolYearId(e.target.value)}
+              >
+                {schoolYears.map((sy) => (
+                  <option key={sy.id} value={sy.id}>
+                    {sy.year} {sy.is_active ? "(Active)" : ""}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {grades.length > 0 && (

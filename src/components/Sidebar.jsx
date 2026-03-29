@@ -20,7 +20,9 @@ import {
 
 import { MdMoreTime } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
+import { LiaUserGraduateSolid } from "react-icons/lia";
 import styles from "../assets/styles/Sidebar.module.css";
+import { FaChild } from "react-icons/fa6";
 
 function Sidebar({ collapsed, setCollapsed }) {
   const location = useLocation();
@@ -36,7 +38,7 @@ function Sidebar({ collapsed, setCollapsed }) {
     {
       name: "Students",
       path: "/students",
-      icon: <FaUserGraduate />,
+      icon: <FaChild />,
       roles: ["admin", "teacher"],
     },
     {
@@ -110,6 +112,12 @@ function Sidebar({ collapsed, setCollapsed }) {
       path: "/school-years",
       icon: <MdMoreTime />,
       roles: ["admin"],
+    },
+    {
+      name: "Promotion",
+      path: "/promotion",
+      icon: <FaUserGraduate />,
+      roles: ["admin", "teacher"],
     },
     {
       name: "Users",

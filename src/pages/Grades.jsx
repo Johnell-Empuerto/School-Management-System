@@ -153,6 +153,9 @@ function Grades() {
     severity: "success",
   });
 
+  const [schoolYears, setSchoolYears] = useState([]);
+  const [schoolYearId, setSchoolYearId] = useState("");
+
   const [search, setSearch] = useState("");
   const [selectedClassSubject, setSelectedClassSubject] = useState(null);
 
@@ -171,19 +174,44 @@ function Grades() {
   ];
 
   useEffect(() => {
+    fetchSchoolYears();
+  }, []);
+
+  useEffect(() => {
+    if (!classSubjectId) return;
+
+    const selected = classSubjects.find(
+      (cs) => cs.id === Number(classSubjectId),
+    );
+
+    setSelectedClassSubject(selected || null);
+  }, [classSubjectId, classSubjects]);
+
+  const fetchSchoolYears = async () => {
+    const res = await api.get("/school-years");
+
+    console.log("SCHOOL YEARS FROM API:", res.data);
+
+    setSchoolYears(res.data);
+
+    const active = res.data.find((y) => y.is_active);
+
+    console.log("ACTIVE SCHOOL YEAR:", active);
+
+    if (active) {
+      setSchoolYearId(active.id);
+    }
+  };
+
+  useEffect(() => {
     fetchClassSubjects();
   }, []);
 
   useEffect(() => {
-    if (classSubjectId) {
+    if (classSubjectId && schoolYearId) {
       fetchGrades();
-      // Find selected class subject details
-      const selected = classSubjects.find(
-        (cs) => cs.id === parseInt(classSubjectId),
-      );
-      setSelectedClassSubject(selected);
     }
-  }, [classSubjectId, gradingPeriod]);
+  }, [classSubjectId, gradingPeriod, schoolYearId]);
 
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity });
@@ -197,6 +225,9 @@ function Grades() {
     setLoading(true);
     try {
       const res = await api.get("/class-subjects/teacher");
+
+      console.log("CLASS SUBJECTS FROM API:", res.data);
+
       setClassSubjects(res.data);
     } catch (error) {
       console.error("Error fetching class subjects:", error);
@@ -205,11 +236,16 @@ function Grades() {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    console.log("CURRENT schoolYearId:", schoolYearId);
+  }, [schoolYearId]);
 
   const fetchGrades = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/grades/${classSubjectId}/${gradingPeriod}`);
+      const res = await api.get(
+        `/grades/${classSubjectId}/${gradingPeriod}/${schoolYearId}`,
+      );
       setGrades(res.data);
     } catch (error) {
       console.error("Error fetching grades:", error);
@@ -410,13 +446,42 @@ function Grades() {
                   )}
                 </div>
 
+                <select
+                  value={schoolYearId}
+                  onChange={(e) => {
+                    console.log("YEAR SELECTED:", e.target.value);
+                    setSchoolYearId(e.target.value);
+                  }}
+                  className={styles.selectInput}
+                >
+                  {schoolYears.map((sy) => {
+                    console.log("Rendering year option:", sy);
+
+                    return (
+                      <option key={sy.id} value={sy.id}>
+                        {sy.year} {sy.is_active ? "(Active)" : ""}
+                      </option>
+                    );
+                  })}
+                </select>
+
                 <div className={styles.selectWrapper}>
                   <select
                     value={classSubjectId}
-                    onChange={(e) => setClassSubjectId(e.target.value)}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setClassSubjectId(id);
+
+                      const selected = classSubjects.find(
+                        (cs) => cs.id === Number(id),
+                      );
+
+                      setSelectedClassSubject(selected);
+                    }}
                     className={styles.selectInput}
                   >
                     <option value="">Select Class Subject</option>
+
                     {filteredClassSubjects.map((cs) => (
                       <option key={cs.id} value={cs.id}>
                         {cs.grade_level} - {cs.section} | {cs.subject_name}

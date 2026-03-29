@@ -20,6 +20,7 @@ import Activity from "../pages/Activity";
 import CalendarPage from "../pages/Calendar";
 import SchoolYears from "../pages/SchoolYears";
 import LicenseExpired from "../pages/LicenseExpired";
+import Promotion from "../pages/Promotion";
 
 import Layout from "../components/Layout";
 import ProtectedRoute from "../components/ProtectedRoute";
@@ -84,6 +85,7 @@ const AppRoutes = () => {
               <Route path="/subjects" element={<Subjects />} />
               <Route path="/class-subjects" element={<ClassSubjects />} />
               <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/promotion" element={<Promotion />} />
               <Route
                 path="/enrollment-requests"
                 element={<EnrollmentRequests />}

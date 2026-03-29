@@ -2,12 +2,21 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import "../assets/styles/Profile.css";
 import { Helmet } from "react-helmet-async";
+import Cropper from "react-easy-crop";
+import { FaCrop } from "react-icons/fa";
 
 function Profile() {
   const [profile, setProfile] = useState(null);
   const [grades, setGrades] = useState([]);
   const [attendance, setAttendance] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+
+  // Crop states
+  const [imageToCrop, setImageToCrop] = useState(null);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
   const [formData, setFormData] = useState({});
 
@@ -29,17 +38,112 @@ function Profile() {
     });
   };
 
+  const MAX_SIZE = 1024 * 1024; // 1MB
+
+  // Crop complete handler
+  const onCropComplete = (croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  };
+
+  // Get cropped image
+  const getCroppedImg = async (imageSrc, pixelCrop) => {
+    const image = new Image();
+    image.src = URL.createObjectURL(imageSrc);
+
+    await new Promise((resolve) => {
+      image.onload = resolve;
+    });
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const size = 256; // final avatar size
+
+    canvas.width = size;
+    canvas.height = size;
+
+    ctx.drawImage(
+      image,
+      pixelCrop.x,
+      pixelCrop.y,
+      pixelCrop.width,
+      pixelCrop.height,
+      0,
+      0,
+      size,
+      size,
+    );
+
+    return canvas.toDataURL("image/jpeg", 0.8);
+  };
+
+  // Apply crop
+  const applyCrop = async () => {
+    if (!imageToCrop || !croppedAreaPixels) return;
+
+    const croppedImage = await getCroppedImg(imageToCrop, croppedAreaPixels);
+
+    setFormData({
+      ...formData,
+      profile_photo: croppedImage,
+    });
+
+    setShowCropModal(false);
+    setImageToCrop(null);
+  };
+
+  // Cancel crop
+  const cancelCrop = () => {
+    setShowCropModal(false);
+    setImageToCrop(null);
+  };
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
 
     if (!file) return;
 
+    // file type validation
+    if (!file.type.startsWith("image/")) {
+      alert("Only image files allowed");
+      return;
+    }
+
+    // file size validation
+    if (file.size > MAX_SIZE) {
+      // If > 1MB, open crop modal
+      setImageToCrop(file);
+      setShowCropModal(true);
+      return;
+    }
+
+    const img = new Image();
     const reader = new FileReader();
 
-    reader.onloadend = () => {
+    reader.onload = (event) => {
+      img.src = event.target.result;
+    };
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      const size = 256; // final avatar size
+      canvas.width = size;
+      canvas.height = size;
+
+      // crop center square
+      const minSide = Math.min(img.width, img.height);
+      const sx = (img.width - minSide) / 2;
+      const sy = (img.height - minSide) / 2;
+
+      ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+
+      const base64 = canvas.toDataURL("image/jpeg", 0.8);
+
       setFormData({
         ...formData,
-        profile_photo: reader.result,
+        profile_photo: base64,
       });
     };
 
@@ -534,6 +638,63 @@ function Profile() {
                 <button className="save-btn" onClick={updateProfile}>
                   Save Changes
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Crop Modal */}
+        {showCropModal && (
+          <div className="crop-modal-overlay" onClick={cancelCrop}>
+            <div
+              className="crop-modal-content"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="crop-modal-header">
+                <h3>
+                  <FaCrop /> Crop Image
+                </h3>
+                <button className="crop-modal-close" onClick={cancelCrop}>
+                  ×
+                </button>
+              </div>
+
+              <div className="crop-container">
+                <Cropper
+                  image={URL.createObjectURL(imageToCrop)}
+                  crop={crop}
+                  zoom={zoom}
+                  aspect={1}
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  onCropComplete={onCropComplete}
+                  cropShape="round"
+                  showGrid={false}
+                />
+              </div>
+
+              <div className="crop-controls">
+                <div className="zoom-control">
+                  <label>Zoom:</label>
+                  <input
+                    type="range"
+                    value={zoom}
+                    min={1}
+                    max={3}
+                    step={0.1}
+                    aria-labelledby="Zoom"
+                    onChange={(e) => setZoom(Number(e.target.value))}
+                    className="zoom-slider"
+                  />
+                </div>
+                <div className="crop-actions">
+                  <button className="crop-cancel-btn" onClick={cancelCrop}>
+                    Cancel
+                  </button>
+                  <button className="crop-apply-btn" onClick={applyCrop}>
+                    Apply Crop
+                  </button>
+                </div>
               </div>
             </div>
           </div>

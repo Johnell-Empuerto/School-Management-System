@@ -26,20 +26,8 @@ import {
   Chip,
   IconButton,
   Tooltip,
-  Box,
-  CircularProgress,
   ThemeProvider,
   createTheme,
-  Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
@@ -113,6 +101,7 @@ function Classes() {
   const [schoolYears, setSchoolYears] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [filterYear, setFilterYear] = useState(null);
 
   // Search and Filter states
   const [searchTerm, setSearchTerm] = useState("");
@@ -139,6 +128,13 @@ function Classes() {
   useEffect(() => {
     let result = classes;
 
+    // Filter by school year (only if a year is selected)
+    if (filterYear) {
+      result = result.filter(
+        (cls) => Number(cls.school_year_id) === Number(filterYear),
+      );
+    }
+
     // Search filter
     if (searchTerm) {
       result = result.filter(
@@ -156,14 +152,13 @@ function Classes() {
 
     setFilteredClasses(result);
     setPage(0);
-  }, [searchTerm, filterGrade, classes]);
+  }, [searchTerm, filterGrade, filterYear, classes]);
 
   const fetchClasses = async () => {
     setLoading(true);
     try {
       const res = await api.get("/classes");
       setClasses(res.data);
-      setFilteredClasses(res.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -172,8 +167,21 @@ function Classes() {
   };
 
   const fetchSchoolYears = async () => {
-    const res = await api.get("/school-years");
-    setSchoolYears(res.data);
+    try {
+      const res = await api.get("/school-years-full");
+      setSchoolYears(res.data);
+
+      // Automatically select active school year
+      const active = res.data.find((y) => y.is_active);
+      if (active) {
+        setFilterYear(Number(active.id));
+      } else if (res.data.length > 0) {
+        // If no active year, select the most recent one
+        setFilterYear(Number(res.data[0].id));
+      }
+    } catch (error) {
+      console.error("Error fetching school years:", error);
+    }
   };
 
   // Sorting function
@@ -286,6 +294,14 @@ function Classes() {
     ...new Set(classes.map((c) => c.grade_level).filter(Boolean)),
   ];
 
+  // Get current selected school year name for display
+  const getSelectedSchoolYearName = () => {
+    const selected = schoolYears.find(
+      (y) => Number(y.id) === Number(filterYear),
+    );
+    return selected ? selected.year : "";
+  };
+
   // Table columns
   const headCells = [
     { id: "grade_level", label: "Grade", sortable: true },
@@ -316,7 +332,7 @@ function Classes() {
                   setFormData({
                     grade_level: "",
                     section: "",
-                    school_year_id: "",
+                    school_year_id: filterYear || "", // Pre-select current year
                   });
                   setShowModal(true);
                 }}
@@ -363,10 +379,35 @@ function Classes() {
               </div>
             )}
 
+            {/* School Year Filter - No "All" option */}
+            {schoolYears.length > 0 && (
+              <div className={styles.filterBox}>
+                <FaFilter className={styles.filterIcon} />
+                <select
+                  value={filterYear || ""}
+                  onChange={(e) => setFilterYear(Number(e.target.value))}
+                >
+                  {schoolYears.map((year) => (
+                    <option key={year.id} value={year.id}>
+                      {year.year} {year.is_active ? "(Active)" : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <button className={styles.refreshBtn} onClick={fetchClasses}>
               <FaSync /> Refresh
             </button>
           </div>
+
+          {/* School Year Indicator */}
+          {filterYear && (
+            <div className={styles.yearIndicator}>
+              Showing classes for:{" "}
+              <strong>{getSelectedSchoolYearName()}</strong>
+            </div>
+          )}
 
           {/* Table */}
           <StyledTableContainer component={Paper}>
@@ -501,12 +542,12 @@ function Classes() {
                       onChange={handleChange}
                     >
                       <option value="">Select Grade</option>
-                      <option value="Grade 1">Grade 1</option>
-                      <option value="Grade 2">Grade 2</option>
-                      <option value="Grade 3">Grade 3</option>
-                      <option value="Grade 4">Grade 4</option>
-                      <option value="Grade 5">Grade 5</option>
-                      <option value="Grade 6">Grade 6</option>
+                      <option value="Grade 7">Grade 7</option>
+                      <option value="Grade 8">Grade 8</option>
+                      <option value="Grade 9">Grade 9</option>
+                      <option value="Grade 10">Grade 10</option>
+                      <option value="Grade 11">Grade 11</option>
+                      <option value="Grade 12">Grade 12</option>
                     </select>
                   </div>
 
@@ -536,7 +577,7 @@ function Classes() {
                       <option value="">Select School Year</option>
                       {schoolYears.map((year) => (
                         <option key={year.id} value={year.id}>
-                          {year.year}
+                          {year.year} {year.is_active ? "(Active)" : ""}
                         </option>
                       ))}
                     </select>

@@ -172,7 +172,7 @@ function Enrollment() {
   // Search and Filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [filterClass, setFilterClass] = useState("all");
-  const [filterSchoolYear, setFilterSchoolYear] = useState("all");
+  const [filterSchoolYear, setFilterSchoolYear] = useState(null);
 
   // Pagination and Sorting
   const [page, setPage] = useState(0);
@@ -203,6 +203,14 @@ function Enrollment() {
       result = result.filter((e) => e.enrollment_status === "dropped");
     }
 
+    // School Year filter (only if a year is selected)
+    if (filterSchoolYear) {
+      result = result.filter(
+        (enrollment) =>
+          Number(enrollment.school_year_id) === Number(filterSchoolYear),
+      );
+    }
+
     // Search filter
     if (searchTerm) {
       result = result.filter(
@@ -223,14 +231,6 @@ function Enrollment() {
     if (filterClass !== "all") {
       result = result.filter(
         (enrollment) => enrollment.class_id === parseInt(filterClass),
-      );
-    }
-
-    // School Year filter
-    if (filterSchoolYear !== "all") {
-      result = result.filter(
-        (enrollment) =>
-          enrollment.school_year_id === parseInt(filterSchoolYear),
       );
     }
 
@@ -274,8 +274,24 @@ function Enrollment() {
   };
 
   const fetchSchoolYears = async () => {
-    const res = await api.get("/school-years");
-    setSchoolYears(res.data);
+    try {
+      // get dropdown list
+      const yearsRes = await api.get("/school-years");
+      setSchoolYears(yearsRes.data);
+
+      // get active school year
+      const activeRes = await api.get("/school-years-active");
+
+      const active = activeRes.data;
+
+      if (active) {
+        setFilterSchoolYear(Number(active.id));
+      } else if (yearsRes.data.length > 0) {
+        setFilterSchoolYear(Number(yearsRes.data[0].id));
+      }
+    } catch (error) {
+      console.error("Error loading school years:", error);
+    }
   };
 
   const showSnackbar = (message, severity = "success") => {
@@ -447,15 +463,34 @@ function Enrollment() {
     name: sy.year,
   }));
 
+  // Get current selected school year name for display
+  const getSelectedSchoolYearName = () => {
+    const selected = schoolYears.find(
+      (y) => Number(y.id) === Number(filterSchoolYear),
+    );
+    return selected ? selected.year : "";
+  };
+
   // Get counts for badges
   const enrolledCount = enrollments.filter(
-    (e) => e.enrollment_status === "enrolled",
+    (e) =>
+      e.enrollment_status === "enrolled" &&
+      (!filterSchoolYear ||
+        Number(e.school_year_id) === Number(filterSchoolYear)),
   ).length;
+
   const completedCount = enrollments.filter(
-    (e) => e.enrollment_status === "completed",
+    (e) =>
+      e.enrollment_status === "completed" &&
+      (!filterSchoolYear ||
+        Number(e.school_year_id) === Number(filterSchoolYear)),
   ).length;
+
   const droppedCount = enrollments.filter(
-    (e) => e.enrollment_status === "dropped",
+    (e) =>
+      e.enrollment_status === "dropped" &&
+      (!filterSchoolYear ||
+        Number(e.school_year_id) === Number(filterSchoolYear)),
   ).length;
 
   // Table columns
@@ -527,7 +562,7 @@ function Enrollment() {
                   setFormData({
                     student_id: "",
                     class_id: "",
-                    school_year_id: "",
+                    school_year_id: filterSchoolYear || "", // Pre-select current year
                   });
                   setShowModal(true);
                 }}
@@ -598,6 +633,14 @@ function Enrollment() {
             />
           </StyledTabs>
 
+          {/* School Year Indicator */}
+          {filterSchoolYear && (
+            <div className={styles.yearIndicator}>
+              Showing enrollments for:{" "}
+              <strong>{getSelectedSchoolYearName()}</strong>
+            </div>
+          )}
+
           {/* Search and Filter Controls */}
           <div className={styles.controls}>
             <div className={styles.searchBox}>
@@ -639,13 +682,15 @@ function Enrollment() {
               <div className={styles.filterBox}>
                 <FaFilter className={styles.filterIcon} />
                 <select
-                  value={filterSchoolYear}
-                  onChange={(e) => setFilterSchoolYear(e.target.value)}
+                  value={filterSchoolYear || ""}
+                  onChange={(e) => setFilterSchoolYear(Number(e.target.value))}
                 >
-                  <option value="all">All School Years</option>
                   {schoolYearOptions.map((sy) => (
                     <option key={sy.id} value={sy.id}>
-                      {sy.name}
+                      {sy.name}{" "}
+                      {schoolYears.find((y) => y.id === sy.id)?.is_active
+                        ? "(Active)"
+                        : ""}
                     </option>
                   ))}
                 </select>
@@ -879,11 +924,18 @@ function Enrollment() {
                       required
                     >
                       <option value="">Select Class</option>
-                      {classes.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.grade_level} - {c.section}
-                        </option>
-                      ))}
+                      {classes
+                        .filter(
+                          (c) =>
+                            !filterSchoolYear ||
+                            Number(c.school_year_id) ===
+                              Number(filterSchoolYear),
+                        )
+                        .map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.grade_level} - {c.section}
+                          </option>
+                        ))}
                     </select>
                   </div>
 
@@ -898,7 +950,7 @@ function Enrollment() {
                       <option value="">Select School Year</option>
                       {schoolYears.map((sy) => (
                         <option key={sy.id} value={sy.id}>
-                          {sy.year}
+                          {sy.year} {sy.is_active ? "(Active)" : ""}
                         </option>
                       ))}
                     </select>

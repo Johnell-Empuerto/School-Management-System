@@ -65,6 +65,23 @@
   flex-wrap: wrap;
 }
 
+/* Year Indicator */
+.yearIndicator {
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background-color: #e8f5e8;
+  border-radius: 30px;
+  color: #2e7d32;
+  font-size: 0.95rem;
+  display: inline-block;
+  border-left: 4px solid #2e7d32;
+}
+
+.yearIndicator strong {
+  font-weight: 700;
+  margin-left: 5px;
+}
+
 /* Add Button */
 .addBtn {
   padding: 12px 24px;
